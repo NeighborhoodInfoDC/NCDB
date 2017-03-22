@@ -156,6 +156,19 @@ quit;
   
   %if %upcase( &register ) = Y %then %do;
 
+    %Finalize_data_set(
+    data=Ncdb_sum_2010&geosuf,
+    out=Ncdb_sum_2010&geosuf,
+    outlib=NCDB,
+    label="NCDB summary, 2010, DC, &geodlbl",
+    sortby=&geo,
+    /** Metadata parameters **/
+    revisions=%str(&revisions),
+    /** File info parameters **/
+    printobs=5,
+    freqvars=&freqvars
+  )
+
     %Dc_update_meta_file(
       ds_lib=NCDB,
       ds_name=Ncdb_sum_2010&geosuf,
