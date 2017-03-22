@@ -17,6 +17,8 @@
   09/09/12 PAT Updated for new 2010/2012 geos.
   03/26/15 PAT Udated for SAS1 server.
                Added Pop65andOverYears_2010.
+  03/20/17 RP Added bridge park geography. 
+  03/22/17 RP Fixed order of datasteps to correct errors when running in batch mode. 
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -32,75 +34,12 @@
 %let register = Y;
 
 /** Update with information on latest file revision **/
-%let revisions = %str(Added Pop65andOverYears_2010.);
+%let revisions = %str(Added bridge park geography);
 
 %let year = 2010;
 %let y    = 1;
 
 %let sum_vars = TotPop: Pop: Num: ;
-
-
-/** Macro Ncdb_sum_geo - Start Definition **/
-
-%macro Ncdb_sum_geo( geo= );
-
-  %local geosuf geodlbl geofmt;
-
-  %let geo = %upcase( &geo );
-
-  %if %sysfunc( putc( &geo, $geoval. ) ) ~= %then %do;
-    %let geosuf = %sysfunc( putc( &geo, $geosuf. ) );
-    %let geodlbl = %qsysfunc( putc( &geo, $geodlbl. ) );
-    %let geofmt = %sysfunc( putc( &geo, $geoafmt. ) );
-  %end;
-  %else %do;
-    %err_mput( macro=Create_sum_geo, msg=Invalid or missing value of GEO= parameter (GEO=&geo). )
-    %goto exit_macro;
-  %end;
-      
-  %put _local_;
-  
-  ** Convert data to single obs. per geographic unit & year **;
-
-  proc summary data=Ncdb_2010 nway completetypes;
-    class &geo / preloadfmt;
-    var &sum_vars;
-    output 
-      out=Ncdb.Ncdb_sum_2010&geosuf 
-            (label="NCDB summary, 2010, DC, &geodlbl" 
-             sortedby=&geo
-             drop=_type_ _freq_) 
-      sum=;
-    format &geo &geofmt;
-  run;
-  
-  /***x "purge [dcdata.ncdb.data]Ncdb_sum_2010&geosuf..*";***/
-  
-  %File_info( data=Ncdb.Ncdb_sum_2010&geosuf, printobs=0 )
-  
-  /***
-  proc compare base=Ncdb_r.Ncdb_sum_2010&geosuf compare=Ncdb_l.Ncdb_sum_2010&geosuf listall maxprint=(40,32000);
-    id &geo;
-  run;
-  ***/
-  
-  %if %upcase( &register ) = Y %then %do;
-
-    %Dc_update_meta_file(
-      ds_lib=NCDB,
-      ds_name=Ncdb_sum_2010&geosuf,
-      creator_process=Ncdb_2010_sum_all.sas,
-      restrictions=None,
-      revisions=%str(&revisions)
-    )
-
-  %end;
-
-  %exit_macro:
-
-%mend Ncdb_sum_geo;
-
-/** End Macro Definition **/
 
 
 ** Create DataPlace-compatible variable names **;
@@ -171,6 +110,69 @@ proc datasets library=Work memtype=(data);
 quit;
 
 
+/** Macro Ncdb_sum_geo - Start Definition **/
+
+%macro Ncdb_sum_geo( geo= );
+
+  %local geosuf geodlbl geofmt;
+
+  %let geo = %upcase( &geo );
+
+  %if %sysfunc( putc( &geo, $geoval. ) ) ~= %then %do;
+    %let geosuf = %sysfunc( putc( &geo, $geosuf. ) );
+    %let geodlbl = %qsysfunc( putc( &geo, $geodlbl. ) );
+    %let geofmt = %sysfunc( putc( &geo, $geoafmt. ) );
+  %end;
+  %else %do;
+    %err_mput( macro=Create_sum_geo, msg=Invalid or missing value of GEO= parameter (GEO=&geo). )
+    %goto exit_macro;
+  %end;
+      
+  %put _local_;
+  
+  ** Convert data to single obs. per geographic unit & year **;
+
+  proc summary data=Ncdb_2010 nway completetypes;
+    class &geo / preloadfmt;
+    var &sum_vars;
+    output 
+      out=Ncdb_sum_2010&geosuf 
+            (label="NCDB summary, 2010, DC, &geodlbl" 
+             sortedby=&geo
+             drop=_type_ _freq_) 
+      sum=;
+    format &geo &geofmt;
+  run;
+  
+  /***x "purge [dcdata.ncdb.data]Ncdb_sum_2010&geosuf..*";***/
+  
+  %File_info( data=Ncdb_sum_2010&geosuf, printobs=0 )
+  
+  /***
+  proc compare base=Ncdb_r.Ncdb_sum_2010&geosuf compare=Ncdb_l.Ncdb_sum_2010&geosuf listall maxprint=(40,32000);
+    id &geo;
+  run;
+  ***/
+  
+  %if %upcase( &register ) = Y %then %do;
+
+    %Dc_update_meta_file(
+      ds_lib=NCDB,
+      ds_name=Ncdb_sum_2010&geosuf,
+      creator_process=Ncdb_2010_sum_all.sas,
+      restrictions=None,
+      revisions=%str(&revisions)
+    )
+
+  %end;
+
+  %exit_macro:
+
+%mend Ncdb_sum_geo;
+
+/** End Macro Definition **/
+
+
 %Ncdb_sum_geo( geo=voterpre2012 )
 %Ncdb_sum_geo( geo=eor )
 %Ncdb_sum_geo( geo=anc2002 )
@@ -184,6 +186,7 @@ quit;
 %Ncdb_sum_geo( geo=ward2002 )
 %Ncdb_sum_geo( geo=ward2012 )
 %Ncdb_sum_geo( geo=zip )
+%Ncdb_sum_geo( geo=bridgepk )
 
 run;
 
