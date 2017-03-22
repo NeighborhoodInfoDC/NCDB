@@ -24,13 +24,9 @@
 
   %let state = %lowcase( &state );
 
-  %syslput state=&state;
-
   %local freqvars;
   
   %let freqvars = sumlev;
-  
-  %syslput freqvars=&freqvars;
   
   
   data NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
@@ -98,7 +94,7 @@
       end;
       
       %let freqvars = &freqvars voterpre2012 anc2002 anc2012 city cluster2000 cluster_tr2000  
-                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip;
+                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk;
       
     %end;
     
@@ -436,8 +432,6 @@
       AIANHHSC CSASC CNECTASC NMEMI RESERVED;
     
   run;
-
-  %File_info( data=NCDB_2010_&state._blk, printobs=0, freqvars=&freqvars )
 
   %Finalize_data_set(
     data=NCDB_2010_&state._blk,

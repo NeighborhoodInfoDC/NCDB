@@ -24,14 +24,7 @@
 %include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
-%DCData_lib( NCDB, local=n )
-
-** Start submitting commands to remote server **;
-
-/***rsubmit;***/
-
-/** Change to N for testing, Y for final batch mode run **/
-%let register = Y;
+%DCData_lib( NCDB )
 
 /** Update with information on latest file revision **/
 %let revisions = %str(Added bridge park geography);
@@ -144,19 +137,7 @@ quit;
     format &geo &geofmt;
   run;
   
-  /***x "purge [dcdata.ncdb.data]Ncdb_sum_2010&geosuf..*";***/
-  
-  %File_info( data=Ncdb_sum_2010&geosuf, printobs=0 )
-  
-  /***
-  proc compare base=Ncdb_r.Ncdb_sum_2010&geosuf compare=Ncdb_l.Ncdb_sum_2010&geosuf listall maxprint=(40,32000);
-    id &geo;
-  run;
-  ***/
-  
-  %if %upcase( &register ) = Y %then %do;
-
-    %Finalize_data_set(
+  %Finalize_data_set(
     data=Ncdb_sum_2010&geosuf,
     out=Ncdb_sum_2010&geosuf,
     outlib=NCDB,
@@ -165,26 +146,15 @@ quit;
     /** Metadata parameters **/
     revisions=%str(&revisions),
     /** File info parameters **/
-    printobs=5,
-    freqvars=&freqvars
+    printobs=0,
+    freqvars=&geo
   )
-
-    %Dc_update_meta_file(
-      ds_lib=NCDB,
-      ds_name=Ncdb_sum_2010&geosuf,
-      creator_process=Ncdb_2010_sum_all.sas,
-      restrictions=None,
-      revisions=%str(&revisions)
-    )
-
-  %end;
 
   %exit_macro:
 
 %mend Ncdb_sum_geo;
 
 /** End Macro Definition **/
-
 
 %Ncdb_sum_geo( geo=voterpre2012 )
 %Ncdb_sum_geo( geo=eor )
@@ -203,9 +173,4 @@ quit;
 
 run;
 
-/***endrsubmit;***/
-
-** End submitting commands to remote server **;
-
-/***signoff;***/
 

@@ -23,7 +23,7 @@
 %include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
-%DCData_lib( NCDB, local=n )
+%DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
 %let revisions = Add bridge park geography.
