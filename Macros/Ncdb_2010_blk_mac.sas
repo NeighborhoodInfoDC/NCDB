@@ -15,6 +15,7 @@
   07/21/12 PAT Added new DC geos: Ward2012, Anc2012, Psa2012.
   08/29/12 PAT Fixed problem with frequency variables for non-DC states.
   12/17/12 PAT Moved freqvars macro var to remote session.
+  03/20/17 RP Update for bridge park geography. 
 **************************************************************************/
 
 /** Macro Ncdb_2010_blk_mac - Start Definition **/
@@ -23,19 +24,12 @@
 
   %let state = %lowcase( &state );
 
-  %syslput state=&state;
-
   %local freqvars;
   
   %let freqvars = sumlev;
   
-  %syslput freqvars=&freqvars;
   
-  ** Start submitting commands to remote server **;
-
-  rsubmit;
-  
-  data Ncdb.NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
+  data NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
     
     set Census.Census_pl_2010_&state.;
     where sumlev = "750";
@@ -94,11 +88,13 @@
         %Block10_to_city( )
         
         %Block10_to_eor( )
+
+		%Block10_to_bpk( )
         
       end;
       
       %let freqvars = &freqvars voterpre2012 anc2002 anc2012 city cluster2000 cluster_tr2000  
-                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip;
+                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk;
       
     %end;
     
@@ -437,13 +433,21 @@
     
   run;
 
-  %File_info( data=Ncdb.NCDB_2010_&state._blk, printobs=0, freqvars=&freqvars )
+  %Finalize_data_set(
+    data=NCDB_2010_&state._blk,
+    out=NCDB_2010_&state._blk,
+    outlib=NCDB,
+    label="NCDB, 2010, DC, block",
+    sortby=geo2010,
+    /** Metadata parameters **/
+    revisions=%str(&revisions),
+    /** File info parameters **/
+    printobs=5,
+    freqvars=&freqvars
+  )
 
   run;
 
-  endrsubmit;
-
-  ** End submitting commands to remote server **;
 
 %mend Ncdb_2010_blk_mac;
 

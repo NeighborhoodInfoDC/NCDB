@@ -17,14 +17,17 @@
   07/21/12 PAT Added new DC geos: Ward2012, Anc2012, Psa2012.
   03/26/15 PAT Updated for SAS1 server.
                Added OLD1N and OLD1 from SF1 (DC only).
+  03/20/17 RP Added bridge park geography. 
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
-%DCData_lib( NCDB, local=n )
+%DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
+%let revisions = Add bridge park geography.
+;
 
 %Ncdb_2010_blk_mac( dc )
 
