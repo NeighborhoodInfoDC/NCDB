@@ -450,6 +450,7 @@
 	  OLD1N = "Persons 65+ years old"
 	  OLD1 = "Proportion of persons who are 65+ years old";
 
+	keep GeoBlk2010 OLD1N OLD1;
 
   run;
 
