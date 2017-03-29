@@ -16,6 +16,7 @@
   08/29/12 PAT Fixed problem with frequency variables for non-DC states.
   12/17/12 PAT Moved freqvars macro var to remote session.
   03/20/17 RP Update for bridge park geography. 
+  03/29/17 RP Added 65 years and older variable. 
 **************************************************************************/
 
 /** Macro Ncdb_2010_blk_mac - Start Definition **/
@@ -29,7 +30,7 @@
   %let freqvars = sumlev;
   
   
-  data NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
+  data cen_vars;
     
     set Census.Census_pl_2010_&state.;
     where sumlev = "750";
@@ -432,6 +433,35 @@
       AIANHHSC CSASC CNECTASC NMEMI RESERVED;
     
   run;
+
+  data age_vars;
+  	set census.census_sf1_2010_dc_blks;
+
+	TRCTPOP1=P1i1;
+
+    OLD1N = sum( P12Ai20, P12Ai21, P12Ai22, P12Ai23, P12Ai24, P12Ai25,
+				 P12Ai44, P12Ai45, P12Ai46, P12Ai47, P12Ai48, P12Ai49 );
+
+	if TRCTPOP1 > 0 then do;
+      OLD1 = OLD1N/TRCTPOP1;
+    end;
+
+    label
+	  OLD1N = "Persons 65+ years old"
+	  OLD1 = "Proportion of persons who are 65+ years old";
+
+	keep GeoBlk2010 OLD1N OLD1;
+
+  run;
+
+  proc sort data = cen_vars; by GeoBlk2010; run;
+  proc sort data = age_vars; by GeoBlk2010; run;
+
+  data NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
+   	merge cen_vars age_vars;
+	by GeoBlk2010;
+  run;
+
 
   %Finalize_data_set(
     data=NCDB_2010_&state._blk,
