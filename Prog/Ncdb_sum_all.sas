@@ -13,15 +13,15 @@
   11/21/08 PAT Removed AVG variables from summary file (need to calculate).
   09/09/12 PAT Updated for new 2010/2012 geos.
                New weights for Median vars.
+  03/23/17 JD  Updated to include Bridge Park Geography (also updated to 
+			   SAS1 from Alpha).
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
-%include "K:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
+%include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( Ncdb )
 
-rsubmit;
 
 %Create_all_summary_from_tracts( 
 
@@ -29,7 +29,7 @@ rsubmit;
   register=Y,
   
   /** Update with information on latest file revision **/
-  revisions=%str(Updated for new 2010/2012 geos. New weights for Median vars.),
+  revisions=%str(Added Bridge Park geography),
 
   lib=Ncdb,
   data_pre=Ncdb_sum, 
@@ -44,7 +44,3 @@ rsubmit;
 )
 
 run;
-
-endrsubmit;
-
-signoff;
