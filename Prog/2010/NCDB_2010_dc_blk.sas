@@ -18,6 +18,7 @@
   03/26/15 PAT Updated for SAS1 server.
                Added OLD1N and OLD1 from SF1 (DC only).
   03/20/17 RP Added bridge park geography. 
+  03/29/17 RP Added 65 years and older variable. 
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -26,7 +27,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Add bridge park geography.
+%let revisions = Added 65 years and older variable.
 ;
 
 %Ncdb_2010_blk_mac( dc )

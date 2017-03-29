@@ -16,6 +16,7 @@
   08/29/12 PAT Fixed problem with frequency variables for non-DC states.
   12/17/12 PAT Moved freqvars macro var to remote session.
   03/20/17 RP Update for bridge park geography. 
+  03/29/17 RP Added 65 years and older variable. 
 **************************************************************************/
 
 /** Macro Ncdb_2010_blk_mac - Start Definition **/
@@ -399,10 +400,13 @@
 
     ADULT1N = P0030001;
     CHILD1N = TRCTPOP1 - ADULT1N;
+	OLD1N = sum( P0120020, P0120021, P0120022, P0120023, P0120024, P0120025,
+				 P0120044, P0120045, P0120046, P0120047, P0120048, P0120049 );
 
     if TRCTPOP1 > 0 then do;
       ADULT1 = ADULT1N/TRCTPOP1;
       CHILD1 = CHILD1N/TRCTPOP1;
+	  OLD1 = OLD1N/TRCTPOP1;
     end;
 
     label
@@ -410,6 +414,8 @@
       ADULT1 = "Prop. of persons who are adults 18+ years old, 2010"
       CHILD1N = "Children under 18 years old, 2010"
       CHILD1 = "Prop. of persons who are children under 18 years old, 2010";
+	  OLD1N = "Persons 65+ years old";
+	  OLD1 = "Proportion of persons who are 65+ years old";
 
     ** Housing **;
 
