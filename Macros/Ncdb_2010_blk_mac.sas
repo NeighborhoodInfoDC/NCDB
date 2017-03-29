@@ -30,7 +30,7 @@
   %let freqvars = sumlev;
   
   
-  data NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
+  data cen_vars;
     
     set Census.Census_pl_2010_&state.;
     where sumlev = "750";
@@ -400,13 +400,10 @@
 
     ADULT1N = P0030001;
     CHILD1N = TRCTPOP1 - ADULT1N;
-	OLD1N = sum( P0120020, P0120021, P0120022, P0120023, P0120024, P0120025,
-				 P0120044, P0120045, P0120046, P0120047, P0120048, P0120049 );
 
     if TRCTPOP1 > 0 then do;
       ADULT1 = ADULT1N/TRCTPOP1;
       CHILD1 = CHILD1N/TRCTPOP1;
-	  OLD1 = OLD1N/TRCTPOP1;
     end;
 
     label
@@ -414,8 +411,6 @@
       ADULT1 = "Prop. of persons who are adults 18+ years old, 2010"
       CHILD1N = "Children under 18 years old, 2010"
       CHILD1 = "Prop. of persons who are children under 18 years old, 2010";
-	  OLD1N = "Persons 65+ years old";
-	  OLD1 = "Proportion of persons who are 65+ years old";
 
     ** Housing **;
 
@@ -438,6 +433,34 @@
       AIANHHSC CSASC CNECTASC NMEMI RESERVED;
     
   run;
+
+  data age_vars;
+  	set census.census_sf1_2010_dc_blks;
+
+	TRCTPOP1=P1i1;
+
+    OLD1N = sum( P12Ai20, P12Ai21, P12Ai22, P12Ai23, P12Ai24, P12Ai25,
+				 P12Ai44, P12Ai45, P12Ai46, P12Ai47, P12Ai48, P12Ai49 );
+
+	if TRCTPOP1 > 0 then do;
+      OLD1 = OLD1N/TRCTPOP1;
+    end;
+
+    label
+	  OLD1N = "Persons 65+ years old"
+	  OLD1 = "Proportion of persons who are 65+ years old";
+
+
+  run;
+
+  proc sort data = cen_vars; by GeoBlk2010; run;
+  proc sort data = age_vars; by GeoBlk2010; run;
+
+  data NCDB_2010_&state._blk (label="NCDB, 2010, %upcase(&state), block");
+   	merge cen_vars age_vars;
+	by GeoBlk2010;
+  run;
+
 
   %Finalize_data_set(
     data=NCDB_2010_&state._blk,
