@@ -19,6 +19,7 @@
                Added OLD1N and OLD1 from SF1 (DC only).
   03/20/17 RP Added bridge park geography. 
   03/29/17 RP Added 65 years and older variable. 
+  08/15/17 RP Fixed 65 years and older variable. 
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -27,7 +28,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Added 65 years and older variable.
+%let revisions = Fixed 65 years and older variable.
 ;
 
 %Ncdb_2010_blk_mac( dc )
