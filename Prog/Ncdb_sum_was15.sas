@@ -522,7 +522,7 @@ proc summary data=Ncdb_sum_&year._was15_tr00;
   where put( geo2000, $cntym15f. ) ~= "";
   by county;
   var &Count_vars &Prop_vars;
-  output out=Ncdb_sum_&year._was15_regcnt
+  output out=Ncdb_sum_&year._was15_regcnt (drop=_type_ _freq_)
     sum(&Count_vars)= 
     mean(&Prop_vars)=;
 run;
