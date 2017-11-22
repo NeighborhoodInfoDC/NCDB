@@ -1,5 +1,5 @@
 /**************************************************************************
- Program:  Create_ncdb_views_alpha_was03.sas
+ Program:  Create_ncdb_views_was15.sas
  Library:  Ncdb
  Project:  NeighborhoodInfo DC
  Author:   P. Tatian
@@ -9,7 +9,7 @@
  
  Description:  Create & register data views for NCDB 2017 metro area files.
  
- NOTE: 1980 FILES TEMPORARILY OMITTED.
+ 1990 and 2000 only.
 
  Modifications:
 **************************************************************************/
