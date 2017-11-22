@@ -532,7 +532,7 @@
 
 /** Macro Combine - Start Definition **/
 
-%macro Combine( geo=, years= );
+%macro Combine( geo=, years=, revisions=%str(New file.) );
 
   %local geolbl geosuf i v;
   
@@ -619,7 +619,7 @@
     sortby=&geo,
     /** Metadata parameters **/
     restrictions=None,
-    revisions=%str(New file.),
+    revisions=%str(&revisions),
     /** File info parameters **/
     printobs=0,
     freqvars=county
@@ -630,5 +630,5 @@
 /** End Macro Definition **/
 
 
-%Combine( geo=Geo2000, years=1990 2000 )
-%Combine( geo=County, years=1990 2000 )
+%Combine( geo=Geo2000, years=1990 2000, revisions=%str(Add missing variable labels.) )
+%Combine( geo=County, years=1990 2000, revisions=%str(Add missing variable labels.) )
