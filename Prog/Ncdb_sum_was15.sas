@@ -501,13 +501,36 @@
   quit;
 
   run;
-  
-  ** County-level data set for &year **;
 
+  ** Convert to 2010 tracts **;
   %let Count_vars = agg: Children: elderly: females: grossrent: males: num: 
         people: persons: pop: poverty: tot: ;
 
   %let Prop_vars = median: ;
+
+  %Transform_geo_data(
+	  dat_ds_name=Ncdb_sum_&year._was15_tr00,
+	  dat_org_geo=geo2000,
+	  dat_count_vars=&Count_vars.,
+	  dat_count_moe_vars=,
+	  dat_prop_vars=&Prop_vars.,
+	  wgt_ds_name=General.Wt_tr00_tr10,
+	  wgt_org_geo=geo2000,
+	  wgt_new_geo=geo2010,
+	  wgt_id_vars=,
+	  wgt_prop_var=popwt,
+	  wgt_wgt_var=popwt,
+	  out_ds_name=Ncdb_sum_&year._was15_tr10,
+	  out_ds_label=%str(NCDB &year. in 2010 Census Tracts),
+	  calc_vars=,
+	  calc_vars_labels=,
+	  keep_nonmatch=N,
+	  show_warnings=10,
+	  print_diag=Y,
+	  full_diag=N
+	);
+
+  ** County-level data set for &year **;
 
   proc summary data=Ncdb_sum_&year._was15_tr00;
     where put( geo2000, $cntym15f. ) ~= "";
@@ -537,8 +560,12 @@
   %local geolbl geosuf i v;
   
   %if %upcase( &geo ) = GEO2000 %then %do;
-    %let geolbl =  Census tract (2000);
+    %let geolbl = Census tract (2000);
     %let geosuf = tr00;
+  %end;
+  %else %if %upcase( &geo ) = GEO2010 %then %do;
+    %let geolbl = Census tract (2010);
+    %let geosuf = tr10;
   %end;
   %else %if %upcase( &geo ) = COUNTY %then %do;
     %let geolbl =  County;
@@ -622,7 +649,7 @@
     revisions=%str(&revisions),
     /** File info parameters **/
     printobs=0,
-    freqvars=county
+    freqvars=
   )
 
 %mend Combine;
@@ -630,5 +657,6 @@
 /** End Macro Definition **/
 
 
-%Combine( geo=Geo2000, years=1990 2000, revisions=%str(Add missing variable labels.) )
-%Combine( geo=County, years=1990 2000, revisions=%str(Add missing variable labels.) )
+%Combine( geo=Geo2000, years=1990 2000, revisions=%str(Update for 2010 tracts) )
+%Combine( geo=Geo2010, years=1990 2000, revisions=%str(Update for 2010 tracts) )
+%Combine( geo=County, years=1990 2000, revisions=%str(Update for 2010 tracts) )
