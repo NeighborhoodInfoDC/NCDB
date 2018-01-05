@@ -1,106 +1,37 @@
 /**************************************************************************
- Program:  Ncdb_2010_sum_all.sas
+ Program:  Ncdb_2010_sum_was15.sas
  Library:  NCDB
  Project:  NeighborhoodInfo DC
  Author:   P. Tatian
- Created:  03/23/11
- Version:  SAS 9.1
- Environment:  Windows with SAS/Connect
+ Created:  11/22/17
+ Version:  SAS 9.2
+ Environment:  Local Windows session (desktop)
  
- Description:  Create all NCDB 2010 DC geo summary level files, with
- DataPlace variable names, from block data.
+ Description:  Create 2010 NCDB tract and county level summary files
+for Washington metro area (2015).
 
  Modifications:
-  12/19/12 SXZ Updated to create summaries by 2012 Voting Precincts 
-  03/28/11 PAT Added metadata registration.
-  05/04/11 PAT Added EOR geography.
-  09/09/12 PAT Updated for new 2010/2012 geos.
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
-%include "K:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
+%include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( NCDB )
 
-** Start submitting commands to remote server **;
-
-rsubmit;
-
-/** Change to N for testing, Y for final batch mode run **/
-%let register = Y;
-
-/** Update with information on latest file revision **/
-%let revisions = %str(Updated for new 2010/2012 geos.);
-
 %let year = 2010;
-%let y    = 1;
+%let y = 1;
 
-%let sum_vars = TotPop: Pop: Num: ;
+** Tract-level summary data set for &year **;
 
+data Ncdb_sum_&year._was15_tr10;
 
-/** Macro Ncdb_sum_geo - Start Definition **/
-
-%macro Ncdb_sum_geo( geo= );
-
-  %local geosuf geodlbl geofmt;
-
-  %let geo = %upcase( &geo );
-
-  %if %sysfunc( putc( &geo, $geoval. ) ) ~= %then %do;
-    %let geosuf = %sysfunc( putc( &geo, $geosuf. ) );
-    %let geodlbl = %qsysfunc( putc( &geo, $geodlbl. ) );
-    %let geofmt = %sysfunc( putc( &geo, $geoafmt. ) );
-  %end;
-  %else %do;
-    %err_mput( macro=Create_sum_geo, msg=Invalid or missing value of GEO= parameter (GEO=&geo). )
-    %goto exit_macro;
-  %end;
-      
-  %put _local_;
+  set Ncdb.Ncdb_2010_was15;
   
-  ** Convert data to single obs. per geographic unit & year **;
+  %Regcnt( invar=Geo2010 )
 
-  proc summary data=Ncdb_2010 nway completetypes;
-    class &geo / preloadfmt;
-    var &sum_vars;
-    output 
-      out=Ncdb.Ncdb_sum_2010&geosuf 
-            (label="NCDB summary, 2010, DC, &geodlbl" 
-             sortedby=&geo
-             drop=_type_ _freq_) 
-      sum=;
-    format &geo &geofmt;
-  run;
-  
-  x "purge [dcdata.ncdb.data]Ncdb_sum_2010&geosuf..*";
-  
-  %File_info( data=Ncdb.Ncdb_sum_2010&geosuf, printobs=0 )
-  
-  %if %upcase( &register ) = Y %then %do;
+  label County = "County";
 
-    %Dc_update_meta_file(
-      ds_lib=NCDB,
-      ds_name=Ncdb_sum_2010&geosuf,
-      creator_process=Ncdb_2010_sum_all.sas,
-      restrictions=None,
-      revisions=%str(&revisions)
-    )
-
-  %end;
-
-  %exit_macro:
-
-%mend Ncdb_sum_geo;
-
-/** End Macro Definition **/
-
-
-** Create DataPlace-compatible variable names **;
-
-data Ncdb_2010;
-
-  set Ncdb.NCDB_2010_dc_blk;
+  format county $cnty15f.;
   
   PopMinorityAlone_&year = sum(shr&y.d,-minnhw&y.n);
   PopMinorityBridge_&year = sum(shr&y.d,-shrnhw&y.n);
@@ -128,7 +59,7 @@ data Ncdb_2010;
     VACHU&y.=NumVacantHsgUnits_&year;
 
   keep 
-    _char_ TRCTPOP&y. shr&y.d SHRHSP&y.N SHRNHA&y.N SHRNHB&y.N SHRNHI&y.N SHRNHO&y.N SHRNHW&y.N
+    Geo2010 county TRCTPOP&y. shr&y.d SHRHSP&y.N SHRNHA&y.N SHRNHB&y.N SHRNHI&y.N SHRNHO&y.N SHRNHW&y.N
     MINNHA&y.N MINNHB&y.N MINNHI&y.N MINNHO&y.N MINNHW&y.N MRANHS&y.N 
     PopOtherRaceNonHispBridge_&year PopMinorityAlone_&year PopMinorityBridge_&year
     CHILD&y.N TOTHSUN&y. OCCHU&y. VACHU&y. ;
@@ -136,7 +67,7 @@ data Ncdb_2010;
 run;
 
 proc datasets library=Work memtype=(data);
-  modify Ncdb_2010;
+  modify Ncdb_sum_&year._was15_tr10;
   label
     TotPop_&year = "Total population, &year"
     PopWithRace_&year = "Total population for race/ethnicity, &year"
@@ -161,26 +92,47 @@ proc datasets library=Work memtype=(data);
     NumVacantHsgUnits_&year = "Vacant housing units, &year";
 quit;
 
+%Finalize_data_set( 
+  /** Finalize data set parameters **/
+  data=Ncdb_sum_&year._was15_tr10,
+  out=Ncdb_sum_&year._was15_tr10,
+  outlib=NCDB,
+  label="NCDB summary, 2010, Washington region (2015), Census tract (2010)",
+  sortby=Geo2010,
+  /** Metadata parameters **/
+  restrictions=None,
+  revisions=%str(New file.),
+  /** File info parameters **/
+  contents=Y,
+  printobs=0,
+  freqvars=county
+)
 
-%Ncdb_sum_geo( geo=voterpre2012 )
-%Ncdb_sum_geo( geo=eor )
-%Ncdb_sum_geo( geo=anc2002 )
-%Ncdb_sum_geo( geo=anc2012 )
-%Ncdb_sum_geo( geo=city )
-%Ncdb_sum_geo( geo=cluster_tr2000 )
-%Ncdb_sum_geo( geo=psa2004 )
-%Ncdb_sum_geo( geo=psa2012 )
-%Ncdb_sum_geo( geo=geo2000 )
-%Ncdb_sum_geo( geo=geo2010 )
-%Ncdb_sum_geo( geo=ward2002 )
-%Ncdb_sum_geo( geo=ward2012 )
-%Ncdb_sum_geo( geo=zip )
+** County-level data set for &year **;
 
+%let Count_vars = num: pop: tot: ;
+
+proc summary data=Ncdb_sum_&year._was15_tr10;
+  where put( county, $ctym15f. ) ~= "";
+  by county;
+  var &Count_vars;
+  output out=Ncdb_sum_&year._was15_regcnt (drop=_type_ _freq_)
+    sum(&Count_vars)=;
 run;
 
-endrsubmit;
-
-** End submitting commands to remote server **;
-
-signoff;
+%Finalize_data_set( 
+  /** Finalize data set parameters **/
+  data=Ncdb_sum_&year._was15_regcnt,
+  out=Ncdb_sum_&year._was15_regcnt,
+  outlib=NCDB,
+  label="NCDB summary, 2010, Washington region (2015), County",
+  sortby=county,
+  /** Metadata parameters **/
+  restrictions=None,
+  revisions=%str(New file.),
+  /** File info parameters **/
+  contents=Y,
+  printobs=0,
+  freqvars=county
+)
 

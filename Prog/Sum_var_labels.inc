@@ -1,4 +1,4 @@
-/*** NCDB Variable Labels (updated 7/22/12) ***/
+/*** NCDB Variable Labels (updated 11/22/17) ***/
 
 TotPop_&year = "Total population, &year"
 LandAreaSqMile_&year = "Land area (square miles), &year"
@@ -91,6 +91,7 @@ PopEmployedOccMgmtProf90cat_&year = "Persons 16+ years old employed in managemen
 PopEmployedOccService90cat_&year = "Persons 16+ years old employed in service occupations, &year"
 PopEmployedOccSales90cat_&year = "Persons 16+ years old employed in sales and administrative occ., &year"
 PopEmployedOccFarming90cat_&year = "Pers. 16+ yrs. empl. in farm, fishing, forestry occ. incl. mgmt., &year"
+PopEmployedOccService_&year = "Persons 16+ years old employed in service occupations, &year"
 /*PopEmployedOccOperNFLabor90cat_&year = "Persons 16+ yrs. old empl. in assembly, transport. or labor occ., &year"*/
 /*PopEmployedOccProduction90cat_&year = "Persons 16+ years old empl. in production and repair occupations, &year"*/
 /*PopEmployedOccMgmtProf2000cat_&year = "Persons 16+ years old employed in mgmt. occupations (incl. farms), &year"*/
@@ -99,7 +100,7 @@ PopEmployedIndConstruction_&year = "Persons 16+ years old employed in constructi
 PopEmployedIndManufacturing_&year = "Persons 16+ years old employed in manufacturing, &year"
 PopEmployedIndWholesale_&year = "Persons 16+ years old employed in wholesale trade, &year"
 PopEmployedIndRetail_&year = "Persons 16+ years old employed in retail trade, &year"
-/*PopEmployedIndTransportation_&year = "Pers. 16+ yrs. old employed in transportation, warehsg and util., &year"*/
+PopEmployedIndTransport_&year = "Pers. 16+ yrs. old employed in transportation, warehousing, and utilities, &year"
 PopEmployedIndFIRE_&year = "Pers. 16+ yrs. old employed in finance, insurance and real estate, &year"
 PopEmployedIndProfessional_&year = "Pers. 16+ yrs. old employed in prof., scientific, mgmt., admin., &year"
 PopEmployedIndEducational_&year = "Persons 16+ yrs. old employed in educ., health, social services, &year"
