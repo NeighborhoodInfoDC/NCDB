@@ -113,7 +113,7 @@ quit;
 %let Count_vars = num: pop: tot: ;
 
 proc summary data=Ncdb_sum_&year._was15_tr10;
-  where put( county, $cntym15f. ) ~= "";
+  where put( county, $ctym15f. ) ~= "";
   by county;
   var &Count_vars;
   output out=Ncdb_sum_&year._was15_regcnt (drop=_type_ _freq_)
