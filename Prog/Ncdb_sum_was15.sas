@@ -533,7 +533,7 @@
   ** County-level data set for &year **;
 
   proc summary data=Ncdb_sum_&year._was15_tr00;
-    where put( geo2000, $cntym15f. ) ~= "";
+    where put( county, $ctym15f. ) ~= "";
     by county;
     var &Count_vars &Prop_vars;
     output out=Ncdb_sum_&year._was15_regcnt (drop=_type_ _freq_)
