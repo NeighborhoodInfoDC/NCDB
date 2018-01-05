@@ -23,7 +23,7 @@ for Washington metro area (2015).
 
 ** Tract-level summary data set for &year **;
 
-data Ncdb_sum_&year._was15_tr00;
+data Ncdb_sum_&year._was15_tr10;
 
   set Ncdb.Ncdb_2010_was15;
   
@@ -67,7 +67,7 @@ data Ncdb_sum_&year._was15_tr00;
 run;
 
 proc datasets library=Work memtype=(data);
-  modify Ncdb_sum_&year._was15_tr00;
+  modify Ncdb_sum_&year._was15_tr10;
   label
     TotPop_&year = "Total population, &year"
     PopWithRace_&year = "Total population for race/ethnicity, &year"
@@ -94,10 +94,10 @@ quit;
 
 %Finalize_data_set( 
   /** Finalize data set parameters **/
-  data=Ncdb_sum_&year._was15_tr00,
-  out=Ncdb_sum_&year._was15_tr00,
+  data=Ncdb_sum_&year._was15_tr10,
+  out=Ncdb_sum_&year._was15_tr10,
   outlib=NCDB,
-  label="NCDB summary, 2010, Washington region (2015), Census tract (2000)",
+  label="NCDB summary, 2010, Washington region (2015), Census tract (2010)",
   sortby=Geo2010,
   /** Metadata parameters **/
   restrictions=None,
@@ -112,8 +112,8 @@ quit;
 
 %let Count_vars = num: pop: tot: ;
 
-proc summary data=Ncdb_sum_&year._was15_tr00;
-  where put( geo2010, $cntym15f. ) ~= "";
+proc summary data=Ncdb_sum_&year._was15_tr10;
+  where put( county, $cntym15f. ) ~= "";
   by county;
   var &Count_vars;
   output out=Ncdb_sum_&year._was15_regcnt (drop=_type_ _freq_)
