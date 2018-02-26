@@ -36,7 +36,7 @@ run;
 proc summary data=Ncdb_2010_was15_blk nway;
   class geo2010;
   id metro15 ucounty state;
-  var adult: child: max: min: mr: non: occ: shr: tot: trct: vac:;
+  var adult: child: old: max: min: mr: non: occ: shr: tot: trct: vac:;
   output sum=
     out=Ncdb_2010_was15 (drop=_freq_ _type_);
 run;
@@ -50,7 +50,7 @@ run;
   sortby=geo2010,
   /** Metadata parameters **/
   restrictions=None,
-  revisions=%str(New file.),
+  revisions=%str(Added 65+ variables),
   /** File info parameters **/
   contents=Y,
   printobs=0,
