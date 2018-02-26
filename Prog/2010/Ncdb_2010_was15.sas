@@ -50,7 +50,7 @@ run;
   sortby=geo2010,
   /** Metadata parameters **/
   restrictions=None,
-  revisions=%str(New file.),
+  revisions=%str(Added 65+ variables),
   /** File info parameters **/
   contents=Y,
   printobs=0,
