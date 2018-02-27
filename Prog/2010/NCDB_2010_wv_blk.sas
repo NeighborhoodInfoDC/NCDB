@@ -15,15 +15,15 @@
  Modifications:
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
-%include "K:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
+%include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( NCDB )
 %DCData_lib( Census )
 
+%let revisions = New File;
 
 %Ncdb_2010_blk_mac( wv )
 
 
-signoff;
+

@@ -435,7 +435,7 @@
   run;
 
   data age_vars;
-  	set census.census_sf1_2010_dc_blks;
+  	set census.census_sf1_2010_&state._blks;
 
 	TRCTPOP1=P1i1;
 
