@@ -15,6 +15,7 @@
                New weights for Median vars.
   03/23/17 JD  Updated to include Bridge Park Geography (also updated to 
 			   SAS1 from Alpha).
+  03/16/18 RP  Updated for cluster 2017
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -29,7 +30,7 @@
   register=Y,
   
   /** Update with information on latest file revision **/
-  revisions=%str(Added Bridge Park geography),
+  revisions=%str(Added Cluster2017 geography),
 
   lib=Ncdb,
   data_pre=Ncdb_sum, 
