@@ -17,6 +17,7 @@
   12/17/12 PAT Moved freqvars macro var to remote session.
   03/20/17 RP Update for bridge park geography. 
   03/29/17 RP Added 65 years and older variable. 
+  06/16/18 RP Update for cluster2017 geography.
 **************************************************************************/
 
 /** Macro Ncdb_2010_blk_mac - Start Definition **/
@@ -91,6 +92,8 @@
         %Block10_to_eor( )
 
 		%Block10_to_bpk( )
+
+		%Block10_to_cluster17( )
         
       end;
       

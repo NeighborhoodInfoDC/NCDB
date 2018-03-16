@@ -19,6 +19,7 @@
                Added Pop65andOverYears_2010.
   03/20/17 RP Added bridge park geography. 
   03/22/17 RP Fixed order of datasteps to correct errors when running in batch mode. 
+  03/16/18 RP Added cluster 2017 geography.
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -170,6 +171,7 @@ quit;
 %Ncdb_sum_geo( geo=ward2012 )
 %Ncdb_sum_geo( geo=zip )
 %Ncdb_sum_geo( geo=bridgepk )
+%Ncdb_sum_geo( geo=cluster2017 )
 
 run;
 
