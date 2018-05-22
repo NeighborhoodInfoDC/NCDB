@@ -16,6 +16,7 @@
   03/23/17 JD  Updated to include Bridge Park Geography (also updated to 
 			   SAS1 from Alpha).
   03/16/18 RP  Updated for cluster 2017
+  05/22/18 RP  Updated for Stanton Commons
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -30,7 +31,7 @@
   register=Y,
   
   /** Update with information on latest file revision **/
-  revisions=%str(Added Cluster2017 geography),
+  revisions=%str(Added StantonCommons geography),
 
   lib=Ncdb,
   data_pre=Ncdb_sum, 
