@@ -94,11 +94,13 @@
 		%Block10_to_bpk( )
 
 		%Block10_to_cluster17( )
+
+		%Block10_to_stantoncommons( )
         
       end;
       
       %let freqvars = &freqvars voterpre2012 anc2002 anc2012 city cluster2000 cluster_tr2000  
-                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk;
+                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk cluster2017 stantoncommons;
       
     %end;
     

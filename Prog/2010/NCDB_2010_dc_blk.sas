@@ -29,7 +29,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Added cluster 2017 geography.
+%let revisions = Added Stanton Commons geography.
 ;
 
 %Ncdb_2010_blk_mac( dc )
