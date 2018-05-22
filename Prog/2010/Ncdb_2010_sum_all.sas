@@ -20,6 +20,7 @@
   03/20/17 RP Added bridge park geography. 
   03/22/17 RP Fixed order of datasteps to correct errors when running in batch mode. 
   03/16/18 RP Added cluster 2017 geography.
+  05/22/18 RP Added stanton commons geography.
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -28,7 +29,7 @@
 %DCData_lib( NCDB )
 
 /** Update with information on latest file revision **/
-%let revisions = %str(Added bridge park geography);
+%let revisions = %str(Added Stanton Commons geography);
 
 %let year = 2010;
 %let y    = 1;
@@ -172,6 +173,7 @@ quit;
 %Ncdb_sum_geo( geo=zip )
 %Ncdb_sum_geo( geo=bridgepk )
 %Ncdb_sum_geo( geo=cluster2017 )
+%Ncdb_sum_geo( geo=stantoncommons )
 
 run;
 
