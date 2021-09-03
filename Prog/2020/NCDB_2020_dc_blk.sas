@@ -23,7 +23,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = New file.;
+%let revisions = Fix variable names.;
 
 %Ncdb_2020_blk_mac( dc )
 
