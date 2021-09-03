@@ -100,7 +100,7 @@ run;
 proc summary data=Ncdb.Ncdb_2010_dc_blk nway;
   class &geo;
   var &var2010;
-  output out=Ncdb_2010_dc_sum sum= ;
+  output out=Ncdb_2010_dc_sum (drop=_type_ _freq_) sum= ;
 run;
 
 ** 2020 data **;
@@ -108,7 +108,7 @@ run;
 proc summary data=Ncdb.Ncdb_2020_dc_blk nway;
   class &geo;
   var &var2020;
-  output out=Ncdb_2020_dc_sum sum= ;
+  output out=Ncdb_2020_dc_sum (drop=_type_ _freq_) sum= ;
 run;
 
 data Table;
@@ -119,9 +119,9 @@ data Table;
     Ncdb_2020_dc_sum;
   by &geo;
 
-  trctpop_chg = trctpop2 - trctpop1;
-  tothsun_chg = tothsun2 - TOTHSUN&yrb;
-  occhu_chg = occhu2 - occhu1;
+  trctpop_chg = trctpop&yrb - trctpop&yra;
+  tothsun_chg = tothsun&yrb - TOTHSUN&yra;
+  occhu_chg = occhu&yrb - occhu&yra;
   
 run;
 
