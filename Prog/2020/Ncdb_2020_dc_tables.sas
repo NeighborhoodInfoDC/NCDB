@@ -1,17 +1,16 @@
 /**************************************************************************
- Program:  Ncdb_2010_dc_tables.sas
+ Program:  Ncdb_2020_dc_tables.sas
  Library:  Ncdb
  Project:  Urban-Greater DC
  Author:   P. Tatian
- Created:  03/15/11
+ Created:  09/03/21
  Version:  SAS 9.4
  Environment:  Windows
  GitHub issue:  28
  
- Description:  Tables from 2000 and 2010 NCDB data.
+ Description:  Tables from 2000, 2010 and 2020 NCDB data.
 
  Modifications:
-  9/3/21 Updated code to run under new set up. 
 **************************************************************************/
 
 %include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
@@ -102,7 +101,7 @@ options nodate nonumber;
 
 %fdate()
 
-ods rtf file="&_dcdata_default_path\NCDB\Prog\2010\Ncdb_2010_dc_tables.rtf" style=Styles.Rtf_arial_9pt;
+ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_dc_tables.rtf" style=Styles.Rtf_arial_9pt;
 
 footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
 footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
