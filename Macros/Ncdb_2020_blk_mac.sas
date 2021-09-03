@@ -425,26 +425,26 @@
     CHILD2N = TRCTPOP2 - ADULT2N;
 
     if TRCTPOP2 > 0 then do;
-      ADULT1 = ADULT2N/TRCTPOP2;
-      CHILD1 = CHILD2N/TRCTPOP2;
+      ADULT2 = ADULT2N/TRCTPOP2;
+      CHILD2 = CHILD2N/TRCTPOP2;
     end;
 
     label
       ADULT2N = "Adults 18+ years old, 2020"
-      ADULT1 = "Prop. of persons who are adults 18+ years old, 2020"
+      ADULT2 = "Prop. of persons who are adults 18+ years old, 2020"
       CHILD2N = "Children under 18 years old, 2020"
-      CHILD1 = "Prop. of persons who are children under 18 years old, 2020";
+      CHILD2 = "Prop. of persons who are children under 18 years old, 2020";
 
     ** Housing **;
 
-    TOTHSUN1 = H0010001;
-    OCCHU1 = H0010002;
-    VACHU1 = H0010003;
+    TOTHSUN2 = H0010001;
+    OCCHU2 = H0010002;
+    VACHU2 = H0010003;
 
     label
-      TOTHSUN1 = "Total housing units, 2020"
-      OCCHU1 = "Total occupied housing units, 2020"
-      VACHU1 = "Total vacant housing units, 2020";
+      TOTHSUN2 = "Total housing units, 2020"
+      OCCHU2 = "Total occupied housing units, 2020"
+      VACHU2 = "Total vacant housing units, 2020";
 
     drop 
       P001: P002: P003: P004: H001: FILEID GEOCOMP CHARITER CIFSN LOGRECNO COUNTYCC COUSUB COUSUBCC
