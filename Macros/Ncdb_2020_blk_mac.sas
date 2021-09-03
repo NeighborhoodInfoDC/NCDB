@@ -495,7 +495,7 @@
     data=cen_vars,
     out=NCDB_2020_&state._blk,
     outlib=NCDB,
-    label="NCDB, 2020, DC, block",
+    label="NCDB, 2020, %upcase(&state), block",
     sortby=geo2020,
     /** Metadata parameters **/
     revisions=%str(&revisions),
