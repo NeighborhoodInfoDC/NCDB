@@ -135,6 +135,7 @@ options orientation=landscape;
 %fdate()
 
 ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_dc_tables.rtf" style=Styles.Rtf_arial_9pt;
+ods html body="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_dc_tables.html" style=Default;
 
 footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
 footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
@@ -622,5 +623,47 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title4 'Percent Persons';
 run;
 
+
+*** Graphics ***;
+
+data Scatter;
+
+  set Table;
+  
+  year = 2000;
+  minnhb = minnhb0n / shr0d;
+  shrnhb = shrnhb0n / shr0d;
+  maxnhb = maxnhb0n / shr0d;
+  output;
+  
+  year = 2010;
+  minnhb = minnhb1n / shr1d;
+  shrnhb = shrnhb1n / shr1d;
+  maxnhb = maxnhb1n / shr1d;
+  output;
+  
+  year = 2020;
+  minnhb = minnhb2n / shr2d;
+  shrnhb = shrnhb2n / shr2d;
+  maxnhb = maxnhb2n / shr2d;
+  output;
+  
+  keep ward2012 year minnhb shrnhb maxnhb;
+  
+run;
+
+footnote2;
+
+proc sgplot data=Scatter noautolegend uniform=scale;
+   by ward2012;
+   scatter x=year y=shrnhb / yerrorlower=minnhb
+                           yerrorupper=maxnhb
+                           markerattrs=(color=blue symbol=CircleFilled);
+   series x=year y=shrnhb / lineattrs=(color=blue pattern=2);
+   label Ward2012 = " ";
+   title3 "Proportion Non-Hispanic Black Population (Min, Bridge, Max), DC by Ward";
+run;
+
 ods rtf close;
+ods html close;
 
