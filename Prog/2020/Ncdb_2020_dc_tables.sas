@@ -19,7 +19,14 @@
 %DCData_lib( Ncdb )
 %DCData_lib( Census )
 
-** Summarize 2010 NCDB data by ward **;
+%let yra = 1;
+%let yrb = 2;
+%let yeara = 2010;
+%let yearb = 2020;
+
+
+***********************************************************************************************
+**** Summarize NCDB data by ward;
 
 %let var2000 = 
   TRCTPOP0 SHR0D
@@ -45,7 +52,19 @@
   ADULT1N CHILD1N
   TOTHSUN1 OCCHU1 VACHU1;
 
-%let geo = ward2002;
+%let var2020 = 
+  TRCTPOP2 SHR2D
+  SHRWHT2N SHRBLK2N SHRAMI2N SHRASN2N SHRHIP2N SHRAPI2N SHROTH2N
+  SHRNHW2N SHRNHB2N SHRNHI2N SHRNHR2N SHRNHH2N SHRNHA2N SHRNHO2N SHRHSP2N NONHISP2
+  MINWHT2N MINBLK2N MINAMI2N MINASN2N MINHIP2N MINAPI2N MINOTH2N
+  MINNHW2N MINNHB2N MINNHI2N MINNHR2N MINNHH2N MINNHA2N MINNHO2N
+  MAXWHT2N MAXBLK2N MAXAMI2N MAXASN2N MAXHIP2N MAXAPI2N MAXOTH2N
+  MAXNHW2N MAXNHB2N MAXNHI2N MAXNHR2N MAXNHH2N MAXNHA2N MAXNHO2N
+  MRAPOP2N MR2POP2N MR2POP2N MR3POP2N MRANHS2N MRAHSP2N
+  ADULT2N CHILD2N
+  TOTHSUN2 OCCHU2 VACHU2;
+
+%let geo = ward2012;
 
 ** 2000 data **;
 
@@ -61,9 +80,9 @@ run;
     dat_org_geo=geo2000,
     dat_count_vars=&var2000,
     dat_prop_vars=,
-    wgt_ds_name=General.Wt_tr00_ward02,
+    wgt_ds_name=General.Wt_tr00_ward12,
     wgt_org_geo=geo2000,
-    wgt_new_geo=ward2002,
+    wgt_new_geo=ward2012,
     wgt_id_vars=,
     wgt_wgt_var=popwt,
     out_ds_name=Ncdb_2000_dc_sum,
@@ -84,20 +103,34 @@ proc summary data=Ncdb.Ncdb_2010_dc_blk nway;
   output out=Ncdb_2010_dc_sum sum= ;
 run;
 
+** 2020 data **;
+
+proc summary data=Ncdb.Ncdb_2020_dc_blk nway;
+  class &geo;
+  var &var2020;
+  output out=Ncdb_2020_dc_sum sum= ;
+run;
+
 data Table;
 
   merge 
     Ncdb_2000_dc_sum 
-    Ncdb_2010_dc_sum;
+    Ncdb_2010_dc_sum 
+    Ncdb_2020_dc_sum;
   by &geo;
 
-  trctpop_chg = trctpop1 - trctpop0;
-  tothsun_chg = tothsun1 - tothsun0;
-  occhu_chg = occhu1 - occhu0;
+  trctpop_chg = trctpop2 - trctpop1;
+  tothsun_chg = tothsun2 - TOTHSUN&yrb;
+  occhu_chg = occhu2 - occhu1;
   
 run;
 
+
+***********************************************************************************************
+**** Create tables;
+
 options nodate nonumber;
+options orientation=landscape;
 
 %fdate()
 
@@ -110,30 +143,30 @@ footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\f
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var TRCTPOP0 TOTHSUN0 OCCHU0 TRCTPOP1 TOTHSUN1 OCCHU1 trctpop_chg tothsun_chg occhu_chg;
+  var TRCTPOP&yra TOTHSUN&yra OCCHU&yra TRCTPOP&yrb TOTHSUN&yrb OCCHU&yrb trctpop_chg tothsun_chg occhu_chg;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
     sum='Population' * (
-      trctpop0='2000'
-      trctpop1='2010'
+      TRCTPOP&yra="&yeara"
+      TRCTPOP&yrb="&yearb"
     )
-    pctsum<trctpop0>='% Change' * trctpop_chg=' ' * f=comma8.1
+    pctsum<TRCTPOP&yra>='% Change' * trctpop_chg=' ' * f=comma8.1
     sum='Total Housing Units' * (
-      tothsun0='2000'
-      tothsun1='2010'
+      TOTHSUN&yra="&yeara"
+      TOTHSUN&yrb="&yearb"
     )
-    pctsum<tothsun0>='% Change' * tothsun_chg=' ' * f=comma8.1
+    pctsum<TOTHSUN&yra>='% Change' * tothsun_chg=' ' * f=comma8.1
     sum='Occupied Housing Units' * (
-      occhu0='2000'
-      occhu1='2010'
+      OCCHU&yra="&yeara"
+      OCCHU&yrb="&yearb"
     )
-    pctsum<occhu0>='% Change' * occhu_chg=' ' * f=comma8.1
+    pctsum<OCCHU&yra>='% Change' * occhu_chg=' ' * f=comma8.1
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'Population and Housing Unit Counts - 2000 vs. 2010';
+  title3 "Population and Housing Unit Counts - &yeara vs. &yearb";
 run;
 
 ********  COUNTS  ********;
@@ -142,30 +175,30 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var SHR0D SHRWHT0N SHRBLK0N SHRAMI0N SHRASN0N SHRHIP0N SHRAPI0N SHROTH0N 
-      SHR1D SHRWHT1N SHRBLK1N SHRAMI1N SHRASN1N SHRHIP1N SHRAPI1N SHROTH1N;
+  var SHR&yra.D SHRWHT&yra.N SHRBLK&yra.N SHRAMI&yra.N SHRASN&yra.N SHRHIP&yra.N SHRAPI&yra.N SHROTH&yra.N 
+      SHR&yrb.D SHRWHT&yrb.N SHRBLK&yrb.N SHRAMI&yrb.N SHRASN&yrb.N SHRHIP&yrb.N SHRAPI&yrb.N SHROTH&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      shrwht0n='White'
-      shrblk0n='Black'
-      shrami0n='Am. Indian'
-      shrapi0n='Asian/PI'
-      shroth0n='Other'
+    sum="&yeara" * (
+      shrwht&yra.n='White'
+      shrblk&yra.n='Black'
+      shrami&yra.n='Am. Indian'
+      shrapi&yra.n='Asian/PI'
+      shroth&yra.n='Other'
     )
-    sum='2010' * ( 
-      shrwht1n='White'
-      shrblk1n='Black'
-      shrami1n='Am. Indian'
-      shrapi1n='Asian/PI'
-      shroth1n='Other'
+    sum="&yearb" * ( 
+      shrwht&yrb.n='White'
+      shrblk&yrb.n='Black'
+      shrami&yrb.n='Am. Indian'
+      shrapi&yrb.n='Asian/PI'
+      shroth&yrb.n='Other'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
+  title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
   title4 'Population by Race';
 run;
 
@@ -173,32 +206,32 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var SHR0D SHRNHW0N SHRNHB0N SHRNHI0N SHRNHR0N SHRNHH0N SHRNHA0N SHRNHO0N SHRHSP0N  
-      SHR1D SHRNHW1N SHRNHB1N SHRNHI1N SHRNHR1N SHRNHH1N SHRNHA1N SHRNHO1N SHRHSP1N;
+  var SHR&yra.D SHRNHW&yra.N SHRNHB&yra.N SHRNHI&yra.N SHRNHR&yra.N SHRNHH&yra.N SHRNHA&yra.N SHRNHO&yra.N SHRHSP&yra.N  
+      SHR&yrb.D SHRNHW&yrb.N SHRNHB&yrb.N SHRNHI&yrb.N SHRNHR&yrb.N SHRNHH&yrb.N SHRNHA&yrb.N SHRNHO&yrb.N SHRHSP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      shrnhw0n='NH White'
-      shrnhb0n='NH Black'
-      shrnhi0n='NH Am. Indian'
-      shrnha0n='NH Asian/PI'
-      shrnho0n='NH Other'
-      shrhsp0n='Hispanic'
+    sum="&yeara" * (
+      shrnhw&yra.n='NH White'
+      shrnhb&yra.n='NH Black'
+      shrnhi&yra.n='NH Am. Indian'
+      shrnha&yra.n='NH Asian/PI'
+      shrnho&yra.n='NH Other'
+      shrhsp&yra.n='Hispanic'
     )
-    sum='2010' * ( 
-      shrnhw1n='NH White'
-      shrnhb1n='NH Black'
-      shrnhi1n='NH Am. Indian'
-      shrnha1n='NH Asian/PI'
-      shrnho1n='NH Other'
-      shrhsp1n='Hispanic'
+    sum="&yearb" * ( 
+      shrnhw&yrb.n='NH White'
+      shrnhb&yrb.n='NH Black'
+      shrnhi&yrb.n='NH Am. Indian'
+      shrnha&yrb.n='NH Asian/PI'
+      shrnho&yrb.n='NH Other'
+      shrhsp&yrb.n='Hispanic'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
+  title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
   title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
 run;
 
@@ -206,32 +239,32 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var shr0d minWHT0N minBLK0N minAMI0N minASN0N minHIP0N minAPI0N minOTH0N MRAPOP0N
-      shr1d minWHT1N minBLK1N minAMI1N minASN1N minHIP1N minAPI1N minOTH1N MRAPOP1N;
+  var shr&yra.d minWHT&yra.N minBLK&yra.N minAMI&yra.N minASN&yra.N minHIP&yra.N minAPI&yra.N minOTH&yra.N MRAPOP&yra.N
+      shr&yrb.d minWHT&yrb.N minBLK&yrb.N minAMI&yrb.N minASN&yrb.N minHIP&yrb.N minAPI&yrb.N minOTH&yrb.N MRAPOP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      minwht0n='White alone'
-      minblk0n='Black alone'
-      minami0n='Am. Indian alone'
-      minapi0n='Asian/PI alone'
-      minoth0n='Other alone'
-      mrapop0n='Multiracial'
+    sum="&yeara" * (
+      minwht&yra.n='White alone'
+      minblk&yra.n='Black alone'
+      minami&yra.n='Am. Indian alone'
+      minapi&yra.n='Asian/PI alone'
+      minoth&yra.n='Other alone'
+      mrapop&yra.n='Multiracial'
     )
-    sum='2010' * ( 
-      minwht1n='White alone'
-      minblk1n='Black alone'
-      minami1n='Am. Indian alone'
-      minapi1n='Asian/PI alone'
-      minoth1n='Other alone'
-      mrapop1n='Multiracial'
+    sum="&yearb" * ( 
+      minwht&yrb.n='White alone'
+      minblk&yrb.n='Black alone'
+      minami&yrb.n='Am. Indian alone'
+      minapi&yrb.n='Asian/PI alone'
+      minoth&yrb.n='Other alone'
+      mrapop&yrb.n='Multiracial'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
+  title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
   title4 'Population by Race';
 run;
 
@@ -239,34 +272,34 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var shr0d minNHW0N minNHB0N minNHI0N minNHR0N minNHH0N minNHA0N minNHO0N MRANHS0N SHRHSP0N  
-      shr1d minNHW1N minNHB1N minNHI1N minNHR1N minNHH1N minNHA1N minNHO1N MRANHS1N SHRHSP1N;
+  var shr&yra.d minNHW&yra.N minNHB&yra.N minNHI&yra.N minNHR&yra.N minNHH&yra.N minNHA&yra.N minNHO&yra.N MRANHS&yra.N SHRHSP&yra.N  
+      shr&yrb.d minNHW&yrb.N minNHB&yrb.N minNHI&yrb.N minNHR&yrb.N minNHH&yrb.N minNHA&yrb.N minNHO&yrb.N MRANHS&yrb.N SHRHSP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      minnhw0n='NH White alone'
-      minnhb0n='NH Black alone'
-      minnhi0n='NH Am. Indian alone'
-      minnha0n='NH Asian/PI alone'
-      minnho0n='NH Other alone'
-      mranhs0n='NH Multiracial'
-      shrhsp0n='Hispanic'
+    sum="&yeara" * (
+      minnhw&yra.n='NH White alone'
+      minnhb&yra.n='NH Black alone'
+      minnhi&yra.n='NH Am. Indian alone'
+      minnha&yra.n='NH Asian/PI alone'
+      minnho&yra.n='NH Other alone'
+      mranhs&yra.n='NH Multiracial'
+      shrhsp&yra.n='Hispanic'
     )
-    sum='2010' * ( 
-      minnhw1n='NH White alone'
-      minnhb1n='NH Black alone'
-      minnhi1n='NH Am. Indian alone'
-      minnha1n='NH Asian/PI alone'
-      minnho1n='NH Other alone'
-      mranhs1n='NH Multiracial'
-      shrhsp1n='Hispanic'
+    sum="&yearb" * ( 
+      minnhw&yrb.n='NH White alone'
+      minnhb&yrb.n='NH Black alone'
+      minnhi&yrb.n='NH Am. Indian alone'
+      minnha&yrb.n='NH Asian/PI alone'
+      minnho&yrb.n='NH Other alone'
+      mranhs&yrb.n='NH Multiracial'
+      shrhsp&yrb.n='Hispanic'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
+  title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
   title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
 run;
 
@@ -274,30 +307,30 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var shr0d maxWHT0N maxBLK0N maxAMI0N maxASN0N maxHIP0N maxAPI0N maxOTH0N
-      shr1d maxWHT1N maxBLK1N maxAMI1N maxASN1N maxHIP1N maxAPI1N maxOTH1N;
+  var shr&yra.d maxWHT&yra.N maxBLK&yra.N maxAMI&yra.N maxASN&yra.N maxHIP&yra.N maxAPI&yra.N maxOTH&yra.N
+      shr&yrb.d maxWHT&yrb.N maxBLK&yrb.N maxAMI&yrb.N maxASN&yrb.N maxHIP&yrb.N maxAPI&yrb.N maxOTH&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      maxwht0n='White'
-      maxblk0n='Black'
-      maxami0n='Am. Indian'
-      maxapi0n='Asian/PI'
-      maxoth0n='Other'
+    sum="&yeara" * (
+      maxwht&yra.n='White'
+      maxblk&yra.n='Black'
+      maxami&yra.n='Am. Indian'
+      maxapi&yra.n='Asian/PI'
+      maxoth&yra.n='Other'
     )
-    sum='2010' * ( 
-      maxwht1n='White'
-      maxblk1n='Black'
-      maxami1n='Am. Indian'
-      maxapi1n='Asian/PI'
-      maxoth1n='Other'
+    sum="&yearb" * ( 
+      maxwht&yrb.n='White'
+      maxblk&yrb.n='Black'
+      maxami&yrb.n='Am. Indian'
+      maxapi&yrb.n='Asian/PI'
+      maxoth&yrb.n='Other'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
+  title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
   title4 'Population by Race';
   title5 'NOTE: Subgroups will not add to total population.';
 run;
@@ -306,32 +339,32 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var shr0d maxNHW0N maxNHB0N maxNHI0N maxNHR0N maxNHH0N maxNHA0N maxNHO0N SHRHSP0N  
-      shr1d maxNHW1N maxNHB1N maxNHI1N maxNHR1N maxNHH1N maxNHA1N maxNHO1N SHRHSP1N;
+  var shr&yra.d maxNHW&yra.N maxNHB&yra.N maxNHI&yra.N maxNHR&yra.N maxNHH&yra.N maxNHA&yra.N maxNHO&yra.N SHRHSP&yra.N  
+      shr&yrb.d maxNHW&yrb.N maxNHB&yrb.N maxNHI&yrb.N maxNHR&yrb.N maxNHH&yrb.N maxNHA&yrb.N maxNHO&yrb.N SHRHSP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      maxnhw0n='NH White'
-      maxnhb0n='NH Black'
-      maxnhi0n='NH Am. Indian'
-      maxnha0n='NH Asian/PI'
-      maxnho0n='NH Other'
-      shrhsp0n='Hispanic'
+    sum="&yeara" * (
+      maxnhw&yra.n='NH White'
+      maxnhb&yra.n='NH Black'
+      maxnhi&yra.n='NH Am. Indian'
+      maxnha&yra.n='NH Asian/PI'
+      maxnho&yra.n='NH Other'
+      shrhsp&yra.n='Hispanic'
     )
-    sum='2010' * ( 
-      maxnhw1n='NH White'
-      maxnhb1n='NH Black'
-      maxnhi1n='NH Am. Indian'
-      maxnha1n='NH Asian/PI'
-      maxnho1n='NH Other'
-      shrhsp1n='Hispanic'
+    sum="&yearb" * ( 
+      maxnhw&yrb.n='NH White'
+      maxnhb&yrb.n='NH Black'
+      maxnhi&yrb.n='NH Am. Indian'
+      maxnha&yrb.n='NH Asian/PI'
+      maxnho&yrb.n='NH Other'
+      shrhsp&yrb.n='Hispanic'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
+  title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
   title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
   title5 'NOTE: Subgroups will not add to total population.';
 run;
@@ -340,25 +373,25 @@ run;
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class &geo;
-  var trctpop0 child0n adult0n trctpop1 child1n adult1n;
+  var TRCTPOP&yra child&yra.n adult&yra.n TRCTPOP&yrb child&yrb.n adult&yrb.n;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    sum='2000' * (
-      trctpop0='Total'
-      child0n='Children under 18'
-      adult0n='Adults 18+'
+    sum="&yeara" * (
+      TRCTPOP&yra='Total'
+      child&yra.n='Children under 18'
+      adult&yra.n='Adults 18+'
     )
-    sum='2010' * ( 
-      trctpop1='Total'
-      child1n='Children under 18'
-      adult1n='Adults 18+'
+    sum="&yearb" * ( 
+      TRCTPOP&yrb='Total'
+      child&yrb.n='Children under 18'
+      adult&yrb.n='Adults 18+'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'Child and Adult Population - 2000 vs. 2010';
+  title3 "Child and Adult Population - &yeara vs. &yearb";
   title4 'Persons';
 run;
 
@@ -369,30 +402,30 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var SHR0D SHRWHT0N SHRBLK0N SHRAMI0N SHRASN0N SHRHIP0N SHRAPI0N SHROTH0N 
-      SHR1D SHRWHT1N SHRBLK1N SHRAMI1N SHRASN1N SHRHIP1N SHRAPI1N SHROTH1N;
+  var SHR&yra.D SHRWHT&yra.N SHRBLK&yra.N SHRAMI&yra.N SHRASN&yra.N SHRHIP&yra.N SHRAPI&yra.N SHROTH&yra.N 
+      SHR&yrb.D SHRWHT&yrb.N SHRBLK&yrb.N SHRAMI&yrb.N SHRASN&yrb.N SHRHIP&yrb.N SHRAPI&yrb.N SHROTH&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<shr0d>='2000' * (
-      shrwht0n='White'
-      shrblk0n='Black'
-      shrami0n='Am. Indian'
-      shrapi0n='Asian/PI'
-      shroth0n='Other'
+    pctsum<shr&yra.d>="&yeara" * (
+      shrwht&yra.n='White'
+      shrblk&yra.n='Black'
+      shrami&yra.n='Am. Indian'
+      shrapi&yra.n='Asian/PI'
+      shroth&yra.n='Other'
     )
-    pctsum<shr1d>='2010' * ( 
-      shrwht1n='White'
-      shrblk1n='Black'
-      shrami1n='Am. Indian'
-      shrapi1n='Asian/PI'
-      shroth1n='Other'
+    pctsum<shr&yrb.d>="&yearb" * ( 
+      shrwht&yrb.n='White'
+      shrblk&yrb.n='Black'
+      shrami&yrb.n='Am. Indian'
+      shrapi&yrb.n='Asian/PI'
+      shroth&yrb.n='Other'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
+  title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
   title4 'Percent Population by Race';
 run;
 
@@ -400,32 +433,32 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var SHR0D SHRNHW0N SHRNHB0N SHRNHI0N SHRNHR0N SHRNHH0N SHRNHA0N SHRNHO0N SHRHSP0N  
-      SHR1D SHRNHW1N SHRNHB1N SHRNHI1N SHRNHR1N SHRNHH1N SHRNHA1N SHRNHO1N SHRHSP1N;
+  var SHR&yra.D SHRNHW&yra.N SHRNHB&yra.N SHRNHI&yra.N SHRNHR&yra.N SHRNHH&yra.N SHRNHA&yra.N SHRNHO&yra.N SHRHSP&yra.N  
+      SHR&yrb.D SHRNHW&yrb.N SHRNHB&yrb.N SHRNHI&yrb.N SHRNHR&yrb.N SHRNHH&yrb.N SHRNHA&yrb.N SHRNHO&yrb.N SHRHSP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<shr0d>='2000' * (
-      shrnhw0n='NH White'
-      shrnhb0n='NH Black'
-      shrnhi0n='NH Am. Indian'
-      shrnha0n='NH Asian/PI'
-      shrnho0n='NH Other'
-      shrhsp0n='Hispanic'
+    pctsum<shr&yra.d>="&yeara" * (
+      shrnhw&yra.n='NH White'
+      shrnhb&yra.n='NH Black'
+      shrnhi&yra.n='NH Am. Indian'
+      shrnha&yra.n='NH Asian/PI'
+      shrnho&yra.n='NH Other'
+      shrhsp&yra.n='Hispanic'
     )
-    pctsum<shr1d>='2010' * ( 
-      shrnhw1n='NH White'
-      shrnhb1n='NH Black'
-      shrnhi1n='NH Am. Indian'
-      shrnha1n='NH Asian/PI'
-      shrnho1n='NH Other'
-      shrhsp1n='Hispanic'
+    pctsum<shr&yrb.d>="&yearb" * ( 
+      shrnhw&yrb.n='NH White'
+      shrnhb&yrb.n='NH Black'
+      shrnhi&yrb.n='NH Am. Indian'
+      shrnha&yrb.n='NH Asian/PI'
+      shrnho&yrb.n='NH Other'
+      shrhsp&yrb.n='Hispanic'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
+  title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
   title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
 run;
 
@@ -433,32 +466,32 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var shr0d minWHT0N minBLK0N minAMI0N minASN0N minHIP0N minAPI0N minOTH0N MRAPOP0N
-      shr1d minWHT1N minBLK1N minAMI1N minASN1N minHIP1N minAPI1N minOTH1N MRAPOP1N;
+  var shr&yra.d minWHT&yra.N minBLK&yra.N minAMI&yra.N minASN&yra.N minHIP&yra.N minAPI&yra.N minOTH&yra.N MRAPOP&yra.N
+      shr&yrb.d minWHT&yrb.N minBLK&yrb.N minAMI&yrb.N minASN&yrb.N minHIP&yrb.N minAPI&yrb.N minOTH&yrb.N MRAPOP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<shr0d>='2000' * (
-      minwht0n='White alone'
-      minblk0n='Black alone'
-      minami0n='Am. Indian alone'
-      minapi0n='Asian/PI alone'
-      minoth0n='Other alone'
-      mrapop0n='Multiracial'
+    pctsum<shr&yra.d>="&yeara" * (
+      minwht&yra.n='White alone'
+      minblk&yra.n='Black alone'
+      minami&yra.n='Am. Indian alone'
+      minapi&yra.n='Asian/PI alone'
+      minoth&yra.n='Other alone'
+      mrapop&yra.n='Multiracial'
     )
-    pctsum<shr1d>='2010' * ( 
-      minwht1n='White alone'
-      minblk1n='Black alone'
-      minami1n='Am. Indian alone'
-      minapi1n='Asian/PI alone'
-      minoth1n='Other alone'
-      mrapop1n='Multiracial'
+    pctsum<shr&yrb.d>="&yearb" * ( 
+      minwht&yrb.n='White alone'
+      minblk&yrb.n='Black alone'
+      minami&yrb.n='Am. Indian alone'
+      minapi&yrb.n='Asian/PI alone'
+      minoth&yrb.n='Other alone'
+      mrapop&yrb.n='Multiracial'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
+  title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
   title4 'Percent Population by Race';
 run;
 
@@ -466,34 +499,34 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var shr0d minNHW0N minNHB0N minNHI0N minNHR0N minNHH0N minNHA0N minNHO0N MRANHS0N SHRHSP0N  
-      shr1d minNHW1N minNHB1N minNHI1N minNHR1N minNHH1N minNHA1N minNHO1N MRANHS1N SHRHSP1N;
+  var shr&yra.d minNHW&yra.N minNHB&yra.N minNHI&yra.N minNHR&yra.N minNHH&yra.N minNHA&yra.N minNHO&yra.N MRANHS&yra.N SHRHSP&yra.N  
+      shr&yrb.d minNHW&yrb.N minNHB&yrb.N minNHI&yrb.N minNHR&yrb.N minNHH&yrb.N minNHA&yrb.N minNHO&yrb.N MRANHS&yrb.N SHRHSP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<shr0d>='2000' * (
-      minnhw0n='NH White alone'
-      minnhb0n='NH Black alone'
-      minnhi0n='NH Am. Indian alone'
-      minnha0n='NH Asian/PI alone'
-      minnho0n='NH Other alone'
-      mranhs0n='NH Multiracial'
-      shrhsp0n='Hispanic'
+    pctsum<shr&yra.d>="&yeara" * (
+      minnhw&yra.n='NH White alone'
+      minnhb&yra.n='NH Black alone'
+      minnhi&yra.n='NH Am. Indian alone'
+      minnha&yra.n='NH Asian/PI alone'
+      minnho&yra.n='NH Other alone'
+      mranhs&yra.n='NH Multiracial'
+      shrhsp&yra.n='Hispanic'
     )
-    pctsum<shr1d>='2010' * ( 
-      minnhw1n='NH White alone'
-      minnhb1n='NH Black alone'
-      minnhi1n='NH Am. Indian alone'
-      minnha1n='NH Asian/PI alone'
-      minnho1n='NH Other alone'
-      mranhs1n='NH Multiracial'
-      shrhsp1n='Hispanic'
+    pctsum<shr&yrb.d>="&yearb" * ( 
+      minnhw&yrb.n='NH White alone'
+      minnhb&yrb.n='NH Black alone'
+      minnhi&yrb.n='NH Am. Indian alone'
+      minnha&yrb.n='NH Asian/PI alone'
+      minnho&yrb.n='NH Other alone'
+      mranhs&yrb.n='NH Multiracial'
+      shrhsp&yrb.n='Hispanic'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
+  title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
   title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
 run;
 
@@ -501,30 +534,30 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var shr0d maxWHT0N maxBLK0N maxAMI0N maxASN0N maxHIP0N maxAPI0N maxOTH0N
-      shr1d maxWHT1N maxBLK1N maxAMI1N maxASN1N maxHIP1N maxAPI1N maxOTH1N;
+  var shr&yra.d maxWHT&yra.N maxBLK&yra.N maxAMI&yra.N maxASN&yra.N maxHIP&yra.N maxAPI&yra.N maxOTH&yra.N
+      shr&yrb.d maxWHT&yrb.N maxBLK&yrb.N maxAMI&yrb.N maxASN&yrb.N maxHIP&yrb.N maxAPI&yrb.N maxOTH&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<shr0d>='2000' * (
-      maxwht0n='White'
-      maxblk0n='Black'
-      maxami0n='Am. Indian'
-      maxapi0n='Asian/PI'
-      maxoth0n='Other'
+    pctsum<shr&yra.d>="&yeara" * (
+      maxwht&yra.n='White'
+      maxblk&yra.n='Black'
+      maxami&yra.n='Am. Indian'
+      maxapi&yra.n='Asian/PI'
+      maxoth&yra.n='Other'
     )
-    pctsum<shr1d>='2010' * ( 
-      maxwht1n='White'
-      maxblk1n='Black'
-      maxami1n='Am. Indian'
-      maxapi1n='Asian/PI'
-      maxoth1n='Other'
+    pctsum<shr&yrb.d>="&yearb" * ( 
+      maxwht&yrb.n='White'
+      maxblk&yrb.n='Black'
+      maxami&yrb.n='Am. Indian'
+      maxapi&yrb.n='Asian/PI'
+      maxoth&yrb.n='Other'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
+  title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
   title4 'Percent Population by Race';
   title5 'NOTE: Percentages will not add to 100.';
 run;
@@ -533,32 +566,32 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var shr0d maxNHW0N maxNHB0N maxNHI0N maxNHR0N maxNHH0N maxNHA0N maxNHO0N SHRHSP0N  
-      shr1d maxNHW1N maxNHB1N maxNHI1N maxNHR1N maxNHH1N maxNHA1N maxNHO1N SHRHSP1N;
+  var shr&yra.d maxNHW&yra.N maxNHB&yra.N maxNHI&yra.N maxNHR&yra.N maxNHH&yra.N maxNHA&yra.N maxNHO&yra.N SHRHSP&yra.N  
+      shr&yrb.d maxNHW&yrb.N maxNHB&yrb.N maxNHI&yrb.N maxNHR&yrb.N maxNHH&yrb.N maxNHA&yrb.N maxNHO&yrb.N SHRHSP&yrb.N;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<shr0d>='2000' * (
-      maxnhw0n='NH White'
-      maxnhb0n='NH Black'
-      maxnhi0n='NH Am. Indian'
-      maxnha0n='NH Asian/PI'
-      maxnho0n='NH Other'
-      shrhsp0n='Hispanic'
+    pctsum<shr&yra.d>="&yeara" * (
+      maxnhw&yra.n='NH White'
+      maxnhb&yra.n='NH Black'
+      maxnhi&yra.n='NH Am. Indian'
+      maxnha&yra.n='NH Asian/PI'
+      maxnho&yra.n='NH Other'
+      shrhsp&yra.n='Hispanic'
     )
-    pctsum<shr1d>='2010' * ( 
-      maxnhw1n='NH White'
-      maxnhb1n='NH Black'
-      maxnhi1n='NH Am. Indian'
-      maxnha1n='NH Asian/PI'
-      maxnho1n='NH Other'
-      shrhsp1n='Hispanic'
+    pctsum<shr&yrb.d>="&yearb" * ( 
+      maxnhw&yrb.n='NH White'
+      maxnhb&yrb.n='NH Black'
+      maxnhi&yrb.n='NH Am. Indian'
+      maxnha&yrb.n='NH Asian/PI'
+      maxnho&yrb.n='NH Other'
+      shrhsp&yrb.n='Hispanic'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
+  title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
   title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
   title5 'NOTE: Percentages will not add to 100.';
 run;
@@ -567,25 +600,25 @@ run;
 
 proc tabulate data=Table format=comma8.1 noseps missing;
   class &geo;
-  var trctpop0 child0n adult0n trctpop1 child1n adult1n;
+  var TRCTPOP&yra child&yra.n adult&yra.n TRCTPOP&yrb child&yrb.n adult&yrb.n;
   table 
     /** Rows **/
     all='\b TOTAL' &geo=' ',
     /** Columns **/
-    pctsum<trctpop0>='2000' * (
-      trctpop0='Total'
-      child0n='Children under 18'
-      adult0n='Adults 18+'
+    pctsum<TRCTPOP&yra>="&yeara" * (
+      TRCTPOP&yra='Total'
+      child&yra.n='Children under 18'
+      adult&yra.n='Adults 18+'
     )
-    pctsum<trctpop1>='2010' * ( 
-      trctpop1='Total'
-      child1n='Children under 18'
-      adult1n='Adults 18+'
+    pctsum<TRCTPOP&yrb>="&yearb" * ( 
+      TRCTPOP&yrb='Total'
+      child&yrb.n='Children under 18'
+      adult&yrb.n='Adults 18+'
     )
     / box='DC by Ward'
   ;
   title2 ' ';
-  title3 'Child and Adult Population - 2000 vs. 2010';
+  title3 "Child and Adult Population - &yeara vs. &yearb";
   title4 'Percent Persons';
 run;
 
