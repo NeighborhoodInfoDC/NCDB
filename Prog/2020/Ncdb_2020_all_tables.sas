@@ -740,66 +740,114 @@ run;
     %if &race = hsp %then %do;
     
       year = 2000;
+      shr&race.n = shr&race.0n;
       shr&race. = shr&race.0n / shr0d;
       output;
       
       year = 2010;
+      shr&race.n = shr&race.1n;
       shr&race. = shr&race.1n / shr1d;
       output;
       
       year = 2020;
+      shr&race.n = shr&race.2n;
       shr&race. = shr&race.2n / shr2d;
       output;
       
       format shr&race. percent6.1;
+      format shr&race.n comma12.0;
       
-      keep &geo year shr&race.;
+      keep _type_ &geo year shr&race.n shr&race.;
       
     %end;
     %else %do;
 
       year = 2000;
+      min&race.n = min&race.0n;
+      shr&race.n = shr&race.0n;
+      max&race.n = max&race.0n;
       min&race. = min&race.0n / shr0d;
       shr&race. = shr&race.0n / shr0d;
       max&race. = max&race.0n / shr0d;
       output;
       
       year = 2010;
+      min&race.n = min&race.1n;
+      shr&race.n = shr&race.1n;
+      max&race.n = max&race.1n;
       min&race. = min&race.1n / shr1d;
       shr&race. = shr&race.1n / shr1d;
       max&race. = max&race.1n / shr1d;
       output;
       
       year = 2020;
+      min&race.n = min&race.2n;
+      shr&race.n = shr&race.2n;
+      max&race.n = max&race.2n;
       min&race. = min&race.2n / shr2d;
       shr&race. = shr&race.2n / shr2d;
       max&race. = max&race.2n / shr2d;
       output;
       
       format min&race. shr&race. max&race. percent6.1;
+      format min&race.n shr&race.n max&race.n comma12.0;
       
-      keep &geo year min&race. shr&race. max&race.;
+      keep _type_ &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
       
     %end;
     
   run;
   
+  ** Put DC total last (because total not shown for population counts) **; 
+  
+  proc sort data=Scatter;
+    by descending _type_ &geo;
+  run;
+  
+  
   ** Charts **;
   
-  ods pdf columns=3 startpage=never;
   ods graphics on / width=3in height=2in;
 
+  ods pdf columns=3 startpage=never;
+  
+  ** Population counts **;
+
   proc sgplot data=Scatter noautolegend uniform=scale;
-     by &geo;
-     scatter x=year y=shr&race. / 
-       %if &race ~= hsp %then %do;
-         yerrorlower=min&race.
-         yerrorupper=max&race.
-       %end;
-       markerattrs=(color=blue symbol=CircleFilled);
-     series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
-     label &geo = "&geolabel";
-     title1 "Pct. &racelabel Population, %upcase(&st)";
+    where _type_ = 1;
+    by &geo notsorted;
+    scatter x=year y=shr&race.n / 
+      %if &race ~= hsp %then %do;
+        yerrorlower=min&race.n
+        yerrorupper=max&race.n
+      %end;
+      markerattrs=(color=blue symbol=CircleFilled);
+    series x=year y=shr&race.n / lineattrs=(color=blue pattern=2);
+    xaxis display=(nolabel);
+    yaxis display=(nolabel);
+    label &geo = "&geolabel";
+    title1 "&racelabel Population, %upcase(&st)";
+  run;
+  
+  ods pdf columns=1 startpage=now;
+  
+  ** Percentage of population **;
+  
+  ods pdf columns=3 startpage=never;
+
+  proc sgplot data=Scatter noautolegend uniform=scale;
+    by &geo notsorted;
+    scatter x=year y=shr&race. / 
+      %if &race ~= hsp %then %do;
+        yerrorlower=min&race.
+        yerrorupper=max&race.
+      %end;
+      markerattrs=(color=blue symbol=CircleFilled);
+    series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
+    xaxis display=(nolabel);
+    yaxis display=(nolabel);
+    label &geo = "&geolabel";
+    title1 "Pct. &racelabel Population, %upcase(&st)";
   run;
   
   ods pdf columns=1 startpage=now;
