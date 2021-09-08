@@ -79,7 +79,7 @@ run;
 
 /** Macro Make_output - Start Definition **/
 
-%macro Make_output( st=, geo=, bylabel= );
+%macro Make_output( st=, geo= );
 
   %local geolabel;
 
@@ -861,7 +861,7 @@ run;
 /** End Macro Definition **/
 
 
-%Make_output( st=dc, geo=ward2012, bylabel=Ward )
-%Make_output( st=md, geo=ucounty, bylabel=County )
-%Make_output( st=va, geo=ucounty, bylabel=County )
+%Make_output( st=dc, geo=ward2012 )
+%Make_output( st=md, geo=ucounty )
+%Make_output( st=va, geo=ucounty )
 
