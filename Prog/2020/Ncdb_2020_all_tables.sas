@@ -705,6 +705,7 @@ run;
   
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=Non-Hisp. Black )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=Non-Hisp. White )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=hsp, racelabel=Hispanic/Latinx )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=Non-Hisp. Asian/PI )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=Non-Hisp. Am. Indian )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=Non-Hisp. Other race )
@@ -724,6 +725,8 @@ run;
 
 %macro Scatter_plot( st=, geo=, geolabel=, race=, racelabel= );
 
+  %let race = %lowcase( &race );
+
   *** Graphics ***;
 
   data Scatter;
@@ -733,28 +736,51 @@ run;
     %if &st ~= dc %then %do;
       where _type_ = 1;
     %end;
+    
+    %if &race = hsp %then %do;
+    
+      year = 2000;
+      shr&race. = shr&race.0n / shr0d;
+      output;
+      
+      year = 2010;
+      shr&race. = shr&race.1n / shr1d;
+      output;
+      
+      year = 2020;
+      shr&race. = shr&race.2n / shr2d;
+      output;
+      
+      format shr&race. percent6.1;
+      
+      keep &geo year shr&race.;
+      
+    %end;
+    %else %do;
 
-    year = 2000;
-    min&race. = min&race.0n / shr0d;
-    shr&race. = shr&race.0n / shr0d;
-    max&race. = max&race.0n / shr0d;
-    output;
-    
-    year = 2010;
-    min&race. = min&race.1n / shr1d;
-    shr&race. = shr&race.1n / shr1d;
-    max&race. = max&race.1n / shr1d;
-    output;
-    
-    year = 2020;
-    min&race. = min&race.2n / shr2d;
-    shr&race. = shr&race.2n / shr2d;
-    max&race. = max&race.2n / shr2d;
-    output;
-    
-    format min&race. shr&race. max&race. percent6.1;
-    
-    keep &geo year min&race. shr&race. max&race.;
+      year = 2000;
+      min&race. = min&race.0n / shr0d;
+      shr&race. = shr&race.0n / shr0d;
+      max&race. = max&race.0n / shr0d;
+      output;
+      
+      year = 2010;
+      min&race. = min&race.1n / shr1d;
+      shr&race. = shr&race.1n / shr1d;
+      max&race. = max&race.1n / shr1d;
+      output;
+      
+      year = 2020;
+      min&race. = min&race.2n / shr2d;
+      shr&race. = shr&race.2n / shr2d;
+      max&race. = max&race.2n / shr2d;
+      output;
+      
+      format min&race. shr&race. max&race. percent6.1;
+      
+      keep &geo year min&race. shr&race. max&race.;
+      
+    %end;
     
   run;
   
@@ -765,9 +791,12 @@ run;
 
   proc sgplot data=Scatter noautolegend uniform=scale;
      by &geo;
-     scatter x=year y=shr&race. / yerrorlower=min&race.
-                             yerrorupper=max&race.
-                             markerattrs=(color=blue symbol=CircleFilled);
+     scatter x=year y=shr&race. / 
+       %if &race ~= hsp %then %do;
+         yerrorlower=min&race.
+         yerrorupper=max&race.
+       %end;
+       markerattrs=(color=blue symbol=CircleFilled);
      series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
      label &geo = "&geolabel";
      title1 "Pct. &racelabel Population, %upcase(&st)";
