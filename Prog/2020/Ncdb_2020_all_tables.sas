@@ -63,6 +63,19 @@
   ADULT2N CHILD2N
   TOTHSUN2 OCCHU2 VACHU2;
 
+proc format;
+  value $ward12x
+    ' ' = 'DC TOTAL'
+    '1' = 'Ward 1'
+    '2' = 'Ward 2'
+    '3' = 'Ward 3'
+    '4' = 'Ward 4'
+    '5' = 'Ward 5'
+    '6' = 'Ward 6'
+    '7' = 'Ward 7'
+    '8' = 'Ward 8';
+run;
+
 
 /** Macro Make_output - Start Definition **/
 
@@ -78,7 +91,7 @@
   %end;
   %else %if %lowcase( &geo ) = ward2012 %then %do;
     %let geolabel = Ward;
-    %let geofmt = $ward12a.;
+    %let geofmt = $ward12x.;
   %end;
 
   ** 2000 data **;
@@ -102,7 +115,7 @@
         wgt_new_geo=ward2012,
         wgt_id_vars=,
         wgt_wgt_var=popwt,
-        out_ds_name=Ncdb_2000_dc_sum,
+        out_ds_name=Ncdb_2000_dc_sum_a,
         out_ds_label=,
         calc_vars=,
         calc_vars_labels=,
@@ -112,33 +125,39 @@
         full_diag=N
       )
 
+    proc summary data=Ncdb_2000_dc_sum_a;
+      class &geo;
+      var &var2000;
+      output out=NCDB_2000_dc_sum (drop=_freq_) sum=;
+    run;
+    
   %end;
   %else %do;
 
-    proc summary data=Ncdb.Ncdb_lf_2000_was15 (where=(lowcase(stusab)="&st.")) nway;
+    proc summary data=Ncdb.Ncdb_lf_2000_was15 (where=(lowcase(stusab)="&st."));
       class &geo;
       var &var2000;
-      output out=NCDB_2000_&st._sum (drop=_type_ _freq_) sum=;
+      output out=NCDB_2000_&st._sum (drop=_freq_) sum=;
     run;
     
   %end;
 
   ** 2010 data **;
 
-  proc summary data=Ncdb.Ncdb_2010_&st._blk nway;
+  proc summary data=Ncdb.Ncdb_2010_&st._blk;
     where put( ucounty, $ctym15f. ) ~= "";
     class &geo;
     var &var2010;
-    output out=Ncdb_2010_&st._sum (drop=_type_ _freq_) sum= ;
+    output out=Ncdb_2010_&st._sum (drop= _freq_) sum= ;
   run;
 
   ** 2020 data **;
 
-  proc summary data=Ncdb.Ncdb_2020_&st._blk nway;
+  proc summary data=Ncdb.Ncdb_2020_&st._blk;
     where put( ucounty, $ctym15f. ) ~= "";
     class &geo;
     var &var2020;
-    output out=Ncdb_2020_&st._sum (drop=_type_ _freq_) sum= ;
+    output out=Ncdb_2020_&st._sum (drop=_freq_) sum= ;
   run;
 
   data Table;
@@ -147,7 +166,7 @@
       Ncdb_2000_&st._sum 
       Ncdb_2010_&st._sum 
       Ncdb_2020_&st._sum;
-    by &geo;
+    by _type_ &geo;
 
     trctpop_chg = trctpop&yrb - trctpop&yra;
     tothsun_chg = tothsun&yrb - TOTHSUN&yra;
@@ -175,6 +194,7 @@
   **** Population & housing unit counts ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var TRCTPOP&yra TOTHSUN&yra OCCHU&yra TRCTPOP&yrb TOTHSUN&yrb OCCHU&yrb trctpop_chg tothsun_chg occhu_chg;
     table 
@@ -207,6 +227,7 @@
   **** SHR: Population by race ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var SHR&yra.D SHRWHT&yra.N SHRBLK&yra.N SHRAMI&yra.N SHRASN&yra.N SHRHIP&yra.N SHRAPI&yra.N SHROTH&yra.N 
         SHR&yrb.D SHRWHT&yrb.N SHRBLK&yrb.N SHRAMI&yrb.N SHRASN&yrb.N SHRHIP&yrb.N SHRAPI&yrb.N SHROTH&yrb.N;
@@ -238,6 +259,7 @@
   **** SHR: Population by Race/Ethnicity ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var SHR&yra.D SHRNHW&yra.N SHRNHB&yra.N SHRNHI&yra.N SHRNHR&yra.N SHRNHH&yra.N SHRNHA&yra.N SHRNHO&yra.N SHRHSP&yra.N  
         SHR&yrb.D SHRNHW&yrb.N SHRNHB&yrb.N SHRNHI&yrb.N SHRNHR&yrb.N SHRNHH&yrb.N SHRNHA&yrb.N SHRNHO&yrb.N SHRHSP&yrb.N;
@@ -271,6 +293,7 @@
   **** MIN: Population by race ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d minWHT&yra.N minBLK&yra.N minAMI&yra.N minASN&yra.N minHIP&yra.N minAPI&yra.N minOTH&yra.N MRAPOP&yra.N
         shr&yrb.d minWHT&yrb.N minBLK&yrb.N minAMI&yrb.N minASN&yrb.N minHIP&yrb.N minAPI&yrb.N minOTH&yrb.N MRAPOP&yrb.N;
@@ -304,6 +327,7 @@
   **** MIN: Population by Race/Ethnicity ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d minNHW&yra.N minNHB&yra.N minNHI&yra.N minNHR&yra.N minNHH&yra.N minNHA&yra.N minNHO&yra.N MRANHS&yra.N SHRHSP&yra.N  
         shr&yrb.d minNHW&yrb.N minNHB&yrb.N minNHI&yrb.N minNHR&yrb.N minNHH&yrb.N minNHA&yrb.N minNHO&yrb.N MRANHS&yrb.N SHRHSP&yrb.N;
@@ -339,6 +363,7 @@
   **** MAX: Population by race ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d maxWHT&yra.N maxBLK&yra.N maxAMI&yra.N maxASN&yra.N maxHIP&yra.N maxAPI&yra.N maxOTH&yra.N
         shr&yrb.d maxWHT&yrb.N maxBLK&yrb.N maxAMI&yrb.N maxASN&yrb.N maxHIP&yrb.N maxAPI&yrb.N maxOTH&yrb.N;
@@ -371,6 +396,7 @@
   **** MAX: Population by Race/Ethnicity ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d maxNHW&yra.N maxNHB&yra.N maxNHI&yra.N maxNHR&yra.N maxNHH&yra.N maxNHA&yra.N maxNHO&yra.N SHRHSP&yra.N  
         shr&yrb.d maxNHW&yrb.N maxNHB&yrb.N maxNHI&yrb.N maxNHR&yrb.N maxNHH&yrb.N maxNHA&yrb.N maxNHO&yrb.N SHRHSP&yrb.N;
@@ -405,6 +431,7 @@
   **** Child vs. Adult population ****;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
+    where _type_ = 1;
     class &geo;
     var TRCTPOP&yra child&yra.n adult&yra.n TRCTPOP&yrb child&yrb.n adult&yrb.n;
     table 
@@ -434,6 +461,7 @@
   **** SHR: Population by race ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var SHR&yra.D SHRWHT&yra.N SHRBLK&yra.N SHRAMI&yra.N SHRASN&yra.N SHRHIP&yra.N SHRAPI&yra.N SHROTH&yra.N 
         SHR&yrb.D SHRWHT&yrb.N SHRBLK&yrb.N SHRAMI&yrb.N SHRASN&yrb.N SHRHIP&yrb.N SHRAPI&yrb.N SHROTH&yrb.N;
@@ -465,6 +493,7 @@
   **** SHR: Population by Race/Ethnicity ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var SHR&yra.D SHRNHW&yra.N SHRNHB&yra.N SHRNHI&yra.N SHRNHR&yra.N SHRNHH&yra.N SHRNHA&yra.N SHRNHO&yra.N SHRHSP&yra.N  
         SHR&yrb.D SHRNHW&yrb.N SHRNHB&yrb.N SHRNHI&yrb.N SHRNHR&yrb.N SHRNHH&yrb.N SHRNHA&yrb.N SHRNHO&yrb.N SHRHSP&yrb.N;
@@ -498,6 +527,7 @@
   **** MIN: Population by race ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d minWHT&yra.N minBLK&yra.N minAMI&yra.N minASN&yra.N minHIP&yra.N minAPI&yra.N minOTH&yra.N MRAPOP&yra.N
         shr&yrb.d minWHT&yrb.N minBLK&yrb.N minAMI&yrb.N minASN&yrb.N minHIP&yrb.N minAPI&yrb.N minOTH&yrb.N MRAPOP&yrb.N;
@@ -531,6 +561,7 @@
   **** MIN: Population by Race/Ethnicity ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d minNHW&yra.N minNHB&yra.N minNHI&yra.N minNHR&yra.N minNHH&yra.N minNHA&yra.N minNHO&yra.N MRANHS&yra.N SHRHSP&yra.N  
         shr&yrb.d minNHW&yrb.N minNHB&yrb.N minNHI&yrb.N minNHR&yrb.N minNHH&yrb.N minNHA&yrb.N minNHO&yrb.N MRANHS&yrb.N SHRHSP&yrb.N;
@@ -566,6 +597,7 @@
   **** MAX: Population by race ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d maxWHT&yra.N maxBLK&yra.N maxAMI&yra.N maxASN&yra.N maxHIP&yra.N maxAPI&yra.N maxOTH&yra.N
         shr&yrb.d maxWHT&yrb.N maxBLK&yrb.N maxAMI&yrb.N maxASN&yrb.N maxHIP&yrb.N maxAPI&yrb.N maxOTH&yrb.N;
@@ -598,6 +630,7 @@
   **** MAX: Population by Race/Ethnicity ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var shr&yra.d maxNHW&yra.N maxNHB&yra.N maxNHI&yra.N maxNHR&yra.N maxNHH&yra.N maxNHA&yra.N maxNHO&yra.N SHRHSP&yra.N  
         shr&yrb.d maxNHW&yrb.N maxNHB&yrb.N maxNHI&yrb.N maxNHR&yrb.N maxNHH&yrb.N maxNHA&yrb.N maxNHO&yrb.N SHRHSP&yrb.N;
@@ -632,6 +665,7 @@
   **** Child vs. Adult population ****;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
+    where _type_ = 1;
     class &geo;
     var TRCTPOP&yra child&yra.n adult&yra.n TRCTPOP&yrb child&yrb.n adult&yrb.n;
     table 
@@ -661,7 +695,7 @@
   footnote1;
   
   options nodate number;
-  options orientation=portrait;
+  options orientation=landscape;
 
   ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" notoc nogfootnote;
   
@@ -669,11 +703,11 @@
 
   ** Scatter plots **;
   
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=Non-Hispanic Black )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=Non-Hispanic White )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=Non-Hispanic Asian/PI )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=Non-Hispanic American Indian )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=Non-Hispanic Other race )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=Non-Hisp. Black )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=Non-Hisp. White )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=Non-Hisp. Asian/PI )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=Non-Hisp. Am. Indian )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=Non-Hisp. Other race )
 
   ods pdf close;
   ods listing;
@@ -695,7 +729,11 @@
   data Scatter;
 
     set Table;
-    
+
+    %if &st ~= dc %then %do;
+      where _type_ = 1;
+    %end;
+
     year = 2000;
     min&race. = min&race.0n / shr0d;
     shr&race. = shr&race.0n / shr0d;
@@ -722,8 +760,8 @@
   
   ** Charts **;
   
-  ods pdf columns=2 startpage=never;
-  ods graphics on / width=4in height=2.75in;
+  ods pdf columns=3 startpage=never;
+  ods graphics on / width=3in height=2in;
 
   proc sgplot data=Scatter noautolegend uniform=scale;
      by &geo;
@@ -732,7 +770,7 @@
                              markerattrs=(color=blue symbol=CircleFilled);
      series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
      label &geo = "&geolabel";
-     title1 "Percent &racelabel Population, %upcase(&st)";
+     title1 "Pct. &racelabel Population, %upcase(&st)";
   run;
   
   ods pdf columns=1 startpage=now;
