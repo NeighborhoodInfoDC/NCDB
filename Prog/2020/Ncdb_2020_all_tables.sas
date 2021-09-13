@@ -1,5 +1,5 @@
 /**************************************************************************
- Program:  Ncdb_2020_md_tables.sas
+ Program:  Ncdb_2020_all_tables.sas
  Library:  Ncdb
  Project:  Urban-Greater DC
  Author:   P. Tatian
@@ -700,6 +700,82 @@ run;
   ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" notoc nogfootnote;
   
   footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+  
+  ** Donut charts **;
+  
+  data Donut;
+  
+    set Table;
+    
+    length age $12;
+      
+    year = 2000;
+    
+    age = 'Adults';
+    pop = adult0n;
+    output;
+
+    age = 'Children';
+    pop = child0n;
+    output;
+    
+    year = 2010;
+    
+    age = 'Adults';
+    pop = adult1n;
+    output;
+
+    age = 'Children';
+    pop = child1n;
+    output;
+    
+    year = 2020;
+    
+    age = 'Adults';
+    pop = adult2n;
+    output;
+
+    age = 'Children';
+    pop = child2n;
+    output;
+    
+    keep _type_ &geo year age pop;
+    
+  run;
+  
+  ** Put DC total last (because total not shown for population counts) **; 
+  
+  proc sort data=Donut;
+    by descending _type_ &geo;
+  run;
+  
+  ods graphics on / width=3in height=2in;
+
+  ods pdf columns=3 startpage=never;
+
+  /*** NOT SUPPORTED IN CURRENT URBAN SAS VERSION ***
+  proc sgpie data=Donut;
+    by year &geo notsorted;
+    donut age / response=pop;
+    title1 "Pct. ;
+  run;
+  */
+
+  proc sgplot data=Donut pctlevel=group;
+    %if &st ~= dc %then %do;
+      where _type_ = 1;
+    %end;
+    by &geo notsorted;
+    vbar year / group=age groupdisplay=stack freq=pop stat=percent;
+    xaxis display=(nolabel);
+    yaxis display=(nolabel);
+    label &geo = "&geolabel" age="Age";
+    title1 "Pct. Adult vs. Child Population, %upcase(&st)";
+  run;
+  
+  %if &st ~= wv %then %do;
+    ods pdf columns=1 startpage=now;
+  %end;
 
   ** Scatter plots **;
   
@@ -829,8 +905,10 @@ run;
     title1 "&racelabel Population, %upcase(&st)";
   run;
   
-  ods pdf columns=1 startpage=now;
-  
+  %if &st ~= wv %then %do;
+    ods pdf columns=1 startpage=now;
+  %end;
+
   ** Percentage of population **;
   
   ods pdf columns=3 startpage=never;
@@ -850,8 +928,10 @@ run;
     title1 "Pct. &racelabel Population, %upcase(&st)";
   run;
   
-  ods pdf columns=1 startpage=now;
-  
+  %if &st ~= wv %then %do;
+    ods pdf columns=1 startpage=now;
+  %end;
+
   proc datasets library=work nolist;
     delete Scatter /memtype=data;
   quit;
@@ -864,4 +944,4 @@ run;
 %Make_output( st=dc, geo=ward2012 )
 %Make_output( st=md, geo=ucounty )
 %Make_output( st=va, geo=ucounty )
-
+%Make_output( st=wv, geo=ucounty )
