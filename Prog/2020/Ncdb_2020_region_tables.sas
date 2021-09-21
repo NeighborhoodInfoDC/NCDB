@@ -9,7 +9,7 @@
  GitHub issue:  28
  
  Description:  Tables from 2000, 2010 and 2020 NCDB data for DC, MD, VA, WV
- jurisdictions in Washington MSA (2015).
+ jurisdictions in Washington MSA (2020).
 
  Modifications:
 **************************************************************************/
@@ -66,7 +66,7 @@
 
 ** 2000 data **;
 
-proc summary data=Ncdb.Ncdb_lf_2000_was15 nway;
+proc summary data=Ncdb.Ncdb_lf_2000_was20 nway;
   class ucounty;
   var &var2000;
   output out=NCDB_2000_sum (drop=_freq_) sum=;
@@ -82,7 +82,7 @@ data Ncdb_2010_blk;
     Ncdb.Ncdb_2010_va_blk
     Ncdb.Ncdb_2010_wv_blk;
 
-  where put( ucounty, $ctym15f. ) ~= "";
+  where put( ucounty, $ctym20f. ) ~= "";
 
 run;
 
@@ -102,7 +102,7 @@ data Ncdb_2020_blk;
     Ncdb.Ncdb_2020_va_blk
     Ncdb.Ncdb_2020_wv_blk;
 
-  where put( ucounty, $ctym15f. ) ~= "";
+  where put( ucounty, $ctym20f. ) ~= "";
 
 run;
 
@@ -124,7 +124,7 @@ data Table;
   tothsun_chg = tothsun&yrb - TOTHSUN&yra;
   occhu_chg = occhu&yrb - occhu&yra;
   
- format ucounty $cnty15f.;
+ format ucounty $cnty20f.;
   
 run;
 

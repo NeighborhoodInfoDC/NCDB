@@ -9,7 +9,7 @@
  GitHub issue:  28
  
  Description:  Tables from 2000, 2010 and 2020 NCDB data for DC, MD, VA
- jurisdictions in Washington MSA (2015).
+ jurisdictions in Washington MSA (2020).
 
  Modifications:
 **************************************************************************/
@@ -87,7 +87,7 @@ run;
   
   %if %lowcase( &geo ) = ucounty %then %do;
     %let geolabel = County;
-    %let geofmt = $cnty15f.;
+    %let geofmt = $cnty20f.;
   %end;
   %else %if %lowcase( &geo ) = ward2012 %then %do;
     %let geolabel = Ward;
@@ -100,7 +100,7 @@ run;
   
     data Ncdb_lf_2000_dc;
 
-      set Ncdb.Ncdb_lf_2000_was15 (where=(statecd='11'));
+      set Ncdb.Ncdb_lf_2000_was20 (where=(statecd='11'));
       
     run;
 
@@ -134,7 +134,7 @@ run;
   %end;
   %else %do;
 
-    proc summary data=Ncdb.Ncdb_lf_2000_was15 (where=(lowcase(stusab)="&st."));
+    proc summary data=Ncdb.Ncdb_lf_2000_was20 (where=(lowcase(stusab)="&st."));
       class &geo;
       var &var2000;
       output out=NCDB_2000_&st._sum (drop=_freq_) sum=;
@@ -145,7 +145,7 @@ run;
   ** 2010 data **;
 
   proc summary data=Ncdb.Ncdb_2010_&st._blk;
-    where put( ucounty, $ctym15f. ) ~= "";
+    where put( ucounty, $ctym20f. ) ~= "";
     class &geo;
     var &var2010;
     output out=Ncdb_2010_&st._sum (drop= _freq_) sum= ;
@@ -154,7 +154,7 @@ run;
   ** 2020 data **;
 
   proc summary data=Ncdb.Ncdb_2020_&st._blk;
-    where put( ucounty, $ctym15f. ) ~= "";
+    where put( ucounty, $ctym20f. ) ~= "";
     class &geo;
     var &var2020;
     output out=Ncdb_2020_&st._sum (drop=_freq_) sum= ;
