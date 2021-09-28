@@ -114,6 +114,8 @@ data Table;
     Ncdb_2010_sum 
     Ncdb_2020_sum;
   by ucounty;
+  
+  retain Metro20 '47900';
 
   trctpop_chg = trctpop2 - trctpop1;
   tothsun_chg = tothsun2 - TOTHSUN1;
@@ -139,7 +141,7 @@ data RaceSummary;
     SHR2D SHRNHB2N SHRNHW2N SHRHSP2N SHRNHA2N SHRNHI2N SHRNHO2N MRANHS2N;
 
   array shr_a{*} 
-    SHR_D SHRNHB_N SHRNHW_N SHRHSP_N SHRNHA_N SHRNHI_N SHRNHO_N MRANHS_N;
+    SHRD SHRNHBN SHRNHWN SHRHSPN SHRNHAN SHRNHIN SHRNHON MRANHSN;
 
   year = 2000;
     
@@ -165,7 +167,7 @@ data RaceSummary;
   
   output;
   
-  keep year ucounty SHR_D SHRNHB_N SHRNHW_N SHRHSP_N SHRNHA_N SHRNHI_N SHRNHO_N MRANHS_N;
+  keep year ucounty SHRD SHRNHBN SHRNHWN SHRHSPN SHRNHAN SHRNHIN SHRNHON MRANHSN;
   
 run;
 
@@ -190,16 +192,16 @@ title3 "Population by Race/Ethnicity, Washington, DC MSA - 2000 to 2020";
 
 proc tabulate data=RaceSummary format=comma10.0 noseps missing;
   class year ucounty;
-  var SHR_D SHRNHB_N SHRNHW_N SHRHSP_N SHRNHA_N SHRNHI_N SHRNHO_N MRANHS_N;
+  var SHRD SHRNHBN SHRNHWN SHRHSPN SHRNHAN SHRNHIN SHRNHON MRANHSN;
   table 
     /** Pages **/
     all='Washington, DC MSA' ucounty=' ',
     /** Rows **/
-    SHR_D='\b TOTAL' SHRNHW_N='NH White' SHRNHB_N='NH Black' SHRHSP_N='Hispanic/Latinx' SHRNHA_N='NH Asian/PI' 
-    SHRNHI_N='NH Am. Indian' SHRNHO_N='NH Other Race' MRANHS_N='\line NH Multiracial',
+    SHRD='\b TOTAL' SHRNHWN='NH White' SHRNHBN='NH Black' SHRHSPN='Hispanic/Latinx' SHRNHAN='NH Asian/PI' 
+    SHRNHIN='NH Am. Indian' SHRNHON='NH Other Race' MRANHSN='\line NH Multiracial',
     /** Columns **/
     sum='Population' * year=' '
-    pctsum<SHR_D>='% Population' * f=comma8.1 * year=' '
+    pctsum<SHRD>='% Population' * f=comma8.1 * year=' '
     / condense
   ;
 run;
@@ -305,4 +307,186 @@ ods listing;
 
 title2;
 footnote1;
+
+
+** Scatter plots **;
+
+/** Macro Scatter_plot - Start Definition **/
+
+%macro Scatter_plot( st=, geo=, geolabel=, race=, racelabel=, pagebreak=y );
+
+  %let race = %lowcase( &race );
+
+  *** Graphics ***;
+
+  data Scatter;
+
+    set Table_sum;
+
+    %if &st ~= dc %then %do;
+      where _type_ = 1;
+    %end;
+    
+    %if &race = hsp %then %do;
+    
+      year = 2000;
+      shr&race.n = shr&race.0n;
+      shr&race. = shr&race.0n / shr0d;
+      output;
+      
+      year = 2010;
+      shr&race.n = shr&race.1n;
+      shr&race. = shr&race.1n / shr1d;
+      output;
+      
+      year = 2020;
+      shr&race.n = shr&race.2n;
+      shr&race. = shr&race.2n / shr2d;
+      output;
+      
+      format shr&race. percent6.1;
+      format shr&race.n comma12.0;
+      
+      keep _type_ &geo year shr&race.n shr&race.;
+      
+    %end;
+    %else %do;
+
+      year = 2000;
+      min&race.n = min&race.0n;
+      shr&race.n = shr&race.0n;
+      max&race.n = max&race.0n;
+      min&race. = min&race.0n / shr0d;
+      shr&race. = shr&race.0n / shr0d;
+      max&race. = max&race.0n / shr0d;
+      output;
+      
+      year = 2010;
+      min&race.n = min&race.1n;
+      shr&race.n = shr&race.1n;
+      max&race.n = max&race.1n;
+      min&race. = min&race.1n / shr1d;
+      shr&race. = shr&race.1n / shr1d;
+      max&race. = max&race.1n / shr1d;
+      output;
+      
+      year = 2020;
+      min&race.n = min&race.2n;
+      shr&race.n = shr&race.2n;
+      max&race.n = max&race.2n;
+      min&race. = min&race.2n / shr2d;
+      shr&race. = shr&race.2n / shr2d;
+      max&race. = max&race.2n / shr2d;
+      output;
+      
+      format min&race. shr&race. max&race. percent6.1;
+      format min&race.n shr&race.n max&race.n comma12.0;
+      
+      keep _type_ &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
+      
+    %end;
+    
+  run;
+  
+  ** Put DC total last (because total not shown for population counts) **; 
+  
+  proc sort data=Scatter;
+    by descending _type_ &geo;
+  run;
+  
+  
+  ** Charts **;
+  
+  ** Population counts **;
+
+  proc sgplot data=Scatter noautolegend uniform=scale;
+    scatter x=year y=shr&race.n / 
+      %if &race ~= hsp %then %do;
+        yerrorlower=min&race.n
+        yerrorupper=max&race.n
+      %end;
+      markerattrs=(color=blue symbol=CircleFilled);
+    series x=year y=shr&race.n / lineattrs=(color=blue pattern=2);
+    xaxis display=(nolabel);
+    yaxis display=(nolabel) min=0 max=3000000;
+    label &geo = "&geolabel";
+    %if %length( &st ) > 0 %then %do;
+      title1 "&racelabel Population, %upcase(&st)";
+    %end;
+    %else %do;
+      title1 "&racelabel Population";
+    %end;    
+    title2 "Greater DC Region";
+  run;
+  
+  %if %mparam_is_yes( &pagebreak ) %then %do;
+    ods pdf columns=1 startpage=now;
+    ods pdf columns=3 startpage=never;
+  %end;
+
+  ** Percentage of population **;
+  
+  proc sgplot data=Scatter noautolegend uniform=scale;
+    scatter x=year y=shr&race. / 
+      %if &race ~= hsp %then %do;
+        yerrorlower=min&race.
+        yerrorupper=max&race.
+      %end;
+      markerattrs=(color=blue symbol=CircleFilled);
+    series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
+    xaxis display=(nolabel);
+    yaxis display=(nolabel) min=0 max=0.6;
+    label &geo = "&geolabel";
+    %if %length( &st ) > 0 %then %do;
+      title1 "Pct. &racelabel Population, %upcase(&st)";
+    %end;
+    %else %do;
+      title1 "Pct. &racelabel Population";
+    %end;    
+    title2 "Greater DC Region";
+  run;
+  
+  %if %mparam_is_yes( &pagebreak ) %then %do;
+    ods pdf columns=1 startpage=now;
+    ods pdf columns=3 startpage=never;
+  %end;
+
+  proc datasets library=work nolist;
+    delete Scatter /memtype=data;
+  quit;
+  
+%mend Scatter_plot;
+
+proc summary data=Table nway;
+  class Metro20;
+  var &var2000 &var2010 &var2020;
+  output out=Table_sum sum=;
+run;
+
+options nodate number;
+options orientation=portrait;
+
+ods listing close;
+ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_region_charts.pdf" notoc nogfootnote;
+
+footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+
+  ods graphics on / width=2.666667in height=2in;
+
+  ods pdf columns=3 startpage=never;
+  
+
+
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhw, racelabel=Non-Hisp. White, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhb, racelabel=Non-Hisp. Black, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=hsp, racelabel=Hispanic/Latinx, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nha, racelabel=Non-Hisp. Asian/PI, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhi, racelabel=Non-Hisp. Am. Indian, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nho, racelabel=Non-Hisp. Other race, pagebreak=n )
+
+ods pdf close;
+ods listing;
+
+footnote1;
+title1 "&_library/&_program: Urban-Greater DC";
 

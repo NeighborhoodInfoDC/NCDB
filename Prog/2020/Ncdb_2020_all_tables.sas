@@ -773,14 +773,13 @@ run;
     title1 "Pct. Adult vs. Child Population, %upcase(&st)";
   run;
   
-  %if &st ~= wv %then %do;
     ods pdf columns=1 startpage=now;
-  %end;
+    ods pdf columns=3 startpage=never;
 
   ** Scatter plots **;
   
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=Non-Hisp. Black )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=Non-Hisp. White )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=Non-Hisp. Black )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=hsp, racelabel=Hispanic/Latinx )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=Non-Hisp. Asian/PI )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=Non-Hisp. Am. Indian )
@@ -883,10 +882,6 @@ run;
   
   ** Charts **;
   
-  ods graphics on / width=2.666667in height=2in;
-
-  ods pdf columns=3 startpage=never;
-  
   ** Population counts **;
 
   proc sgplot data=Scatter noautolegend uniform=scale;
@@ -900,19 +895,18 @@ run;
       markerattrs=(color=blue symbol=CircleFilled);
     series x=year y=shr&race.n / lineattrs=(color=blue pattern=2);
     xaxis display=(nolabel);
-    yaxis display=(nolabel);
+    yaxis display=(nolabel) min=0;
     label &geo = "&geolabel";
     title1 "&racelabel Population, %upcase(&st)";
   run;
   
   %if &st ~= wv %then %do;
     ods pdf columns=1 startpage=now;
+    ods pdf columns=3 startpage=never;
   %end;
 
   ** Percentage of population **;
   
-  ods pdf columns=3 startpage=never;
-
   proc sgplot data=Scatter noautolegend uniform=scale;
     by &geo notsorted;
     scatter x=year y=shr&race. / 
@@ -923,13 +917,14 @@ run;
       markerattrs=(color=blue symbol=CircleFilled);
     series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
     xaxis display=(nolabel);
-    yaxis display=(nolabel);
+    yaxis display=(nolabel) min=0;
     label &geo = "&geolabel";
     title1 "Pct. &racelabel Population, %upcase(&st)";
   run;
   
   %if &st ~= wv %then %do;
     ods pdf columns=1 startpage=now;
+    ods pdf columns=3 startpage=never;
   %end;
 
   proc datasets library=work nolist;
