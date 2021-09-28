@@ -20,12 +20,7 @@
 %DCData_lib( Ncdb )
 %DCData_lib( Census )
 
-%global yra yrb yeara yearb var2000 var2010 var2020;
-
-%let yra = 1;
-%let yrb = 2;
-%let yeara = 2010;
-%let yearb = 2020;
+%global var2000 var2010 var2020;
 
 %let var2000 = 
   TRCTPOP0 SHR0D
@@ -120,13 +115,60 @@ data Table;
     Ncdb_2020_sum;
   by ucounty;
 
-  trctpop_chg = trctpop&yrb - trctpop&yra;
-  tothsun_chg = tothsun&yrb - TOTHSUN&yra;
-  occhu_chg = occhu&yrb - occhu&yra;
+  trctpop_chg = trctpop2 - trctpop1;
+  tothsun_chg = tothsun2 - TOTHSUN1;
+  occhu_chg = occhu2 - occhu1;
   
  format ucounty $cnty20f.;
   
 run;
+
+** Format data for race summary tables by year **;
+
+data RaceSummary;
+
+  set Table;
+  
+  array shr0a{*} 
+    SHR0D SHRNHB0N SHRNHW0N SHRHSP0N SHRNHA0N SHRNHI0N SHRNHO0N MRANHS0N;
+
+  array shr1a{*} 
+    SHR1D SHRNHB1N SHRNHW1N SHRHSP1N SHRNHA1N SHRNHI1N SHRNHO1N MRANHS1N;
+
+  array shr2a{*} 
+    SHR2D SHRNHB2N SHRNHW2N SHRHSP2N SHRNHA2N SHRNHI2N SHRNHO2N MRANHS2N;
+
+  array shr_a{*} 
+    SHR_D SHRNHB_N SHRNHW_N SHRHSP_N SHRNHA_N SHRNHI_N SHRNHO_N MRANHS_N;
+
+  year = 2000;
+    
+  do i = 1 to dim( shr_a );
+    shr_a{i} = shr0a{i};
+  end;
+  
+  output;
+  
+  year = 2010;
+    
+  do i = 1 to dim( shr_a );
+    shr_a{i} = shr1a{i};
+  end;
+  
+  output;
+  
+  year = 2020;
+    
+  do i = 1 to dim( shr_a );
+    shr_a{i} = shr2a{i};
+  end;
+  
+  output;
+  
+  keep year ucounty SHR_D SHRNHB_N SHRNHW_N SHRHSP_N SHRNHA_N SHRNHI_N SHRNHO_N MRANHS_N;
+  
+run;
+
 
 ** Make tables **;
 
@@ -141,63 +183,88 @@ ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_region_tables.rtf" 
 footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
 footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 
+title2 ' ';
+
+
+title3 "Population by Race/Ethnicity, Washington, DC MSA - 2000 to 2020";
+
+proc tabulate data=RaceSummary format=comma10.0 noseps missing;
+  class year ucounty;
+  var SHR_D SHRNHB_N SHRNHW_N SHRHSP_N SHRNHA_N SHRNHI_N SHRNHO_N MRANHS_N;
+  table 
+    /** Pages **/
+    all='Washington, DC MSA' ucounty=' ',
+    /** Rows **/
+    SHR_D='\b TOTAL' SHRNHW_N='NH White' SHRNHB_N='NH Black' SHRHSP_N='Hispanic/Latinx' SHRNHA_N='NH Asian/PI' 
+    SHRNHI_N='NH Am. Indian' SHRNHO_N='NH Other Race' MRANHS_N='\line NH Multiracial',
+    /** Columns **/
+    sum='Population' * year=' '
+    pctsum<SHR_D>='% Population' * f=comma8.1 * year=' '
+    / condense
+  ;
+run;
+
+
+title3 "Population, Housing Unit, and Household Counts - 2010 vs. 2020";
+
 proc tabulate data=Table format=comma10.0 noseps missing;
   class ucounty;
-  var TRCTPOP&yra TOTHSUN&yra OCCHU&yra TRCTPOP&yrb TOTHSUN&yrb OCCHU&yrb trctpop_chg tothsun_chg occhu_chg;
+  var TRCTPOP1 TOTHSUN1 OCCHU1 TRCTPOP2 TOTHSUN2 OCCHU2 trctpop_chg tothsun_chg occhu_chg;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
     sum='Population' * (
-      TRCTPOP&yra="&yeara"
-      TRCTPOP&yrb="&yearb"
+      TRCTPOP1="2010"
+      TRCTPOP2="2020"
     )
-    pctsum<TRCTPOP&yra>='% Change' * trctpop_chg=' ' * f=comma8.1
+    pctsum<TRCTPOP1>='% Change' * trctpop_chg=' ' * f=comma8.1
 
     sum='Total Housing Units' * (
-      TOTHSUN&yra="&yeara"
-      TOTHSUN&yrb="&yearb"
+      TOTHSUN1="2010"
+      TOTHSUN2="2020"
     )
-    pctsum<TOTHSUN&yra>='% Change' * tothsun_chg=' ' * f=comma8.1
+    pctsum<TOTHSUN1>='% Change' * tothsun_chg=' ' * f=comma8.1
 
     sum='Households' * (
-      OCCHU&yra="&yeara"
-      OCCHU&yrb="&yearb"
+      OCCHU1="2010"
+      OCCHU2="2020"
     )
-    pctsum<OCCHU&yra>='% Change' * occhu_chg=' ' * f=comma8.1
+    pctsum<OCCHU1>='% Change' * occhu_chg=' ' * f=comma8.1
   ;
-  title2 ' ';
-  title3 "Population, Housing Unit, and Household Counts - &yeara vs. &yearb";
 run;
 
+
+title3 "Population, Housing Unit, and Household Distribution by Jurisdiction - 2000 to 2020";
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class ucounty;
-  var TRCTPOP0 TRCTPOP&yra TOTHSUN0 TOTHSUN&yra OCCHU0 OCCHU&yra TRCTPOP&yrb TOTHSUN&yrb OCCHU&yrb trctpop_chg tothsun_chg occhu_chg;
+  var TRCTPOP0 TRCTPOP1 TOTHSUN0 TOTHSUN1 OCCHU0 OCCHU1 TRCTPOP2 TOTHSUN2 OCCHU2 trctpop_chg tothsun_chg occhu_chg;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='Population' * ( TRCTPOP0="2000" TRCTPOP&yra="&yeara" TRCTPOP&yrb="&yearb" )
-    colpctsum='% Population' * f=comma8.1 * ( TRCTPOP0="2000" TRCTPOP&yra="&yeara" TRCTPOP&yrb="&yearb" )
+    sum='Population' * ( TRCTPOP0="2000" TRCTPOP1="2010" TRCTPOP2="2020" )
+    colpctsum='% Population' * f=comma8.1 * ( TRCTPOP0="2000" TRCTPOP1="2010" TRCTPOP2="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='Housing Units' * ( TOTHSUN0="2000" TOTHSUN&yra="&yeara" TOTHSUN&yrb="&yearb" )
-    colpctsum='% Housing Units' * f=comma8.1 * ( TOTHSUN0="2000" TOTHSUN&yra="&yeara" TOTHSUN&yrb="&yearb" )
+    sum='Housing Units' * ( TOTHSUN0="2000" TOTHSUN1="2010" TOTHSUN2="2020" )
+    colpctsum='% Housing Units' * f=comma8.1 * ( TOTHSUN0="2000" TOTHSUN1="2010" TOTHSUN2="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='Households' * ( OCCHU0="2000" OCCHU&yra="&yeara" OCCHU&yrb="&yearb" )
-    colpctsum='% Households' * f=comma8.1 * ( OCCHU0="2000" OCCHU&yra="&yeara" OCCHU&yrb="&yearb" )
+    sum='Households' * ( OCCHU0="2000" OCCHU1="2010" OCCHU2="2020" )
+    colpctsum='% Households' * f=comma8.1 * ( OCCHU0="2000" OCCHU1="2010" OCCHU2="2020" )
   ;
-  title2 ' ';
-  title3 "Population, Housing Unit, and Household Distribution by Jurisdiction - 2000 to 2020";
 run;
+
+
+title3 "Population by Race/Ethnicity Distribution by Jurisdiction - 2000 to 2020";
 
 proc tabulate data=Table format=comma10.0 noseps missing;
   class ucounty;
@@ -206,32 +273,30 @@ proc tabulate data=Table format=comma10.0 noseps missing;
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='NH Black Population' * ( SHRNHB0N="2000" SHRNHB&yra.N="&yeara" SHRNHB&yrb.N="&yearb" )
-    colpctsum='% NH Black Population' * f=comma8.1 * ( SHRNHB0N="2000" SHRNHB&yra.N="&yeara" SHRNHB&yrb.N="&yearb" )
+    sum='NH White Population' * ( SHRNHW0N="2000" SHRNHW1N="2010" SHRNHW2N="2020" )
+    colpctsum='% NH White Population' * f=comma8.1 * ( SHRNHW0N="2000" SHRNHW1N="2010" SHRNHW2N="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='NH White Population' * ( SHRNHW0N="2000" SHRNHW&yra.N="&yeara" SHRNHW&yrb.N="&yearb" )
-    colpctsum='% NH White Population' * f=comma8.1 * ( SHRNHW0N="2000" SHRNHW&yra.N="&yeara" SHRNHW&yrb.N="&yearb" )
+    sum='NH Black Population' * ( SHRNHB0N="2000" SHRNHB1N="2010" SHRNHB2N="2020" )
+    colpctsum='% NH Black Population' * f=comma8.1 * ( SHRNHB0N="2000" SHRNHB1N="2010" SHRNHB2N="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='Hispanic/Latinx Population' * ( SHRHSP0N="2000" SHRHSP&yra.N="&yeara" SHRHSP&yrb.N="&yearb" )
-    colpctsum='% Hispanic/Latinx Population' * f=comma8.1 * ( SHRHSP0N="2000" SHRHSP&yra.N="&yeara" SHRHSP&yrb.N="&yearb" )
+    sum='Hispanic/Latinx Population' * ( SHRHSP0N="2000" SHRHSP1N="2010" SHRHSP2N="2020" )
+    colpctsum='% Hispanic/Latinx Population' * f=comma8.1 * ( SHRHSP0N="2000" SHRHSP1N="2010" SHRHSP2N="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='NH Asian/PI Population' * ( SHRNHA0N="2000" SHRNHA&yra.N="&yeara" SHRNHA&yrb.N="&yearb" )
-    colpctsum='% NH Asian/PI Population' * f=comma8.1 * ( SHRNHA0N="2000" SHRNHA&yra.N="&yeara" SHRNHA&yrb.N="&yearb" )
+    sum='NH Asian/PI Population' * ( SHRNHA0N="2000" SHRNHA1N="2010" SHRNHA2N="2020" )
+    colpctsum='% NH Asian/PI Population' * f=comma8.1 * ( SHRNHA0N="2000" SHRNHA1N="2010" SHRNHA2N="2020" )
   ;
-  title2 ' ';
-  title3 "Population by Race/Ethnicity Distribution by Jurisdiction - 2000 to 2020";
 run;
 
 

@@ -181,7 +181,7 @@ run;
   **** Create tables;
 
   options nodate nonumber;
-  options orientation=landscape;
+  options orientation=portrait;
 
   %fdate()
 
@@ -695,7 +695,7 @@ run;
   footnote1;
   
   options nodate number;
-  options orientation=landscape;
+  options orientation=portrait;
 
   ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" notoc nogfootnote;
   
@@ -749,7 +749,7 @@ run;
     by descending _type_ &geo;
   run;
   
-  ods graphics on / width=3in height=2in;
+  ods graphics on / width=2.666667in height=2in;
 
   ods pdf columns=3 startpage=never;
 
@@ -883,7 +883,7 @@ run;
   
   ** Charts **;
   
-  ods graphics on / width=3in height=2in;
+  ods graphics on / width=2.666667in height=2in;
 
   ods pdf columns=3 startpage=never;
   
@@ -939,7 +939,6 @@ run;
 %mend Scatter_plot;
 
 /** End Macro Definition **/
-
 
 %Make_output( st=dc, geo=ward2012 )
 %Make_output( st=md, geo=ucounty )
