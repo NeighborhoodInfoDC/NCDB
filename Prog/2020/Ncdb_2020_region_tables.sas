@@ -172,6 +172,53 @@ data RaceSummary;
 run;
 
 
+** Format data for child and adult pop summary tables by year **;
+
+data AgeSummary;
+
+  set Table;
+  
+  array shr0a{*} 
+    TRCTPOP0 ADULT0N CHILD0N;
+
+  array shr1a{*} 
+    TRCTPOP1 ADULT1N CHILD1N;
+
+  array shr2a{*} 
+    TRCTPOP2 ADULT2N CHILD2N;
+
+  array shr_a{*} 
+    TRCTPOP ADULTN CHILDN;
+
+  year = 2000;
+    
+  do i = 1 to dim( shr_a );
+    shr_a{i} = shr0a{i};
+  end;
+  
+  output;
+  
+  year = 2010;
+    
+  do i = 1 to dim( shr_a );
+    shr_a{i} = shr1a{i};
+  end;
+  
+  output;
+  
+  year = 2020;
+    
+  do i = 1 to dim( shr_a );
+    shr_a{i} = shr2a{i};
+  end;
+  
+  output;
+  
+  keep year ucounty TRCTPOP ADULTN CHILDN;
+  
+run;
+
+
 ** Make tables **;
 
 options nodate nonumber;
@@ -202,6 +249,24 @@ proc tabulate data=RaceSummary format=comma10.0 noseps missing;
     /** Columns **/
     sum='Population' * year=' '
     pctsum<SHRD>='% Population' * f=comma8.1 * year=' '
+    / condense
+  ;
+run;
+
+
+title3 "Child and Adult Population, Washington, DC MSA - 2000 to 2020";
+
+proc tabulate data=AgeSummary format=comma10.0 noseps missing;
+  class year ucounty;
+  var TRCTPOP ADULTN CHILDN;
+  table 
+    /** Pages **/
+    all='Washington, DC MSA' ucounty=' ',
+    /** Rows **/
+    TRCTPOP='\b TOTAL' CHILDN='Children under 18' ADULTN='Adults 18+',
+    /** Columns **/
+    sum='Population' * year=' '
+    pctsum<TRCTPOP>='% Population' * f=comma8.1 * year=' '
     / condense
   ;
 run;
