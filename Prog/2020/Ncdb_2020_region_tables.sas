@@ -367,6 +367,85 @@ proc tabulate data=Table format=comma10.0 noseps missing;
 run;
 
 
+** Appendix D table with min, bridged, max pop by race estimates **;
+
+** Format data **;
+
+data RaceBridgeSummary;
+
+  set Table;
+  
+  retain null .;
+  
+  array min2a{*} 
+    SHR2D MINNHW2N MINNHB2N MINNHA2N MINNHI2N MINNHO2N MRANHS2N SHRHSP2N;
+
+  array shr2a{*} 
+    SHR2D SHRNHW2N SHRNHB2N SHRNHA2N SHRNHI2N SHRNHO2N null SHRHSP2N;
+
+  array max2a{*} 
+    SHR2D MAXNHW2N MAXNHB2N MAXNHA2N MAXNHI2N MAXNHO2N null SHRHSP2N;
+
+  array all2a{*} 
+    SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
+
+  type = 'MIN';
+    
+  do i = 1 to dim( all2a );
+    all2a{i} = min2a{i};
+  end;
+
+  output;
+
+  type = 'SHR';
+    
+  do i = 1 to dim( all2a );
+    all2a{i} = shr2a{i};
+  end;
+  
+  output;
+  
+  type = 'MAX';
+    
+  do i = 1 to dim( all2a );
+    all2a{i} = max2a{i};
+  end;
+  
+  output;
+  
+  keep type ucounty SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
+  
+run;
+
+proc format;
+  value $type (notsorted)
+    'MIN' = 'Minimum'
+    'SHR' = 'Bridged'
+    'MAX' = 'Maximum';
+run;
+
+title3 "Minimum, Bridged, and Maximum Population by Race/Ethnicity Estimates - 2020";
+
+proc tabulate data=RaceBridgeSummary format=comma10.0 noseps missing;
+  class ucounty;
+  class type / preloadfmt order=data;
+  var SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
+  table 
+    /** Pages **/
+    all='Washington, DC MSA' ucounty=' ',
+    /** Rows **/
+    SHR2d='Total'
+    NHW2N='NH White' NHB2N='NH Black' NHA2N='NH Asian/PI' 
+    NHI2N='NH Am. Indian' NHO2N='NH Other Race' MRANHS2N='NH Multiracial'
+    SHRHSP2N='Hispanic/Latinx',
+    /** Columns **/
+    ( sum='Population' pctsum<SHR2D>='% Population' * f=comma10.1 ) * type=' '
+    / condense
+  ;
+  format type $type.;
+run;
+
+
 ods rtf close;
 ods listing;
 
