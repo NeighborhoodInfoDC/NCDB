@@ -30,7 +30,7 @@ data Tracts_2010;
     Census.response_rates_2010_wv_tr20;
   by geo2020;
   
-  keep county geo2020 fsrr2010; 
+  keep state county geo2020 fsrr2010; 
 
 run;
 
@@ -51,7 +51,7 @@ data Tracts_2020;
     Census.response_rates_2020_wv_tr20;
   by geo2020;
   
-  keep county geo2020 crrall crrint; 
+  keep state county geo2020 crrall crrint; 
 
 run;
 
@@ -120,12 +120,39 @@ proc tabulate data=Tables_county format=comma10.1 noseps missing;
   ;
 run;
 
-
-
 ods rtf close;
 ods listing;
 
 title2;
 footnote1;
 
+
+** Export data for mapping **;
+
+data Maps;
+
+  merge Tracts_2020 (in=in1) Tracts_2010 (drop=state county);
+  by Geo2020;
+  
+  if in1;
+  
+  keep State County Geo2020 crrall crrint fsrr2010;
+  
+  format Geo2020 ;
+  
+run;
+
+proc univariate data=Maps plots;
+  var crrall;
+run;
+
+filename fexport "&_dcdata_default_path\NCDB\Maps\2020\Response_rate_2010_2020.csv" lrecl=1000;
+
+proc export data=Maps
+    outfile=fexport
+    dbms=csv replace;
+
+run;
+
+filename fexport clear;
 
