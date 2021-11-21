@@ -19,6 +19,8 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census )
 
+** 2010 census tract data **;
+
 data Tracts_2010;
 
   set 
@@ -38,9 +40,7 @@ proc summary data=Tracts_2010;
   output out=Tracts_2010_min_max min= max= /autoname;
 run;
 
-proc print data=Tracts_2010_min_max;
-run;
-
+** 2020 census tract data **;
 
 data Tracts_2020;
 
@@ -61,14 +61,13 @@ proc summary data=Tracts_2020;
   output out=Tracts_2020_min_max min= max= /autoname;
 run;
 
-proc print data=Tracts_2020_min_max;
-run;
+** Combine aggregated tract and county data for county tables **;
 
-data Tables;
+data Tables_county;
 
   merge
     Census.response_rates_2020_was20_regcnt (drop=geo_id metro20 resp_date in=in1)
-    Census.response_rates_2010_was20_regcnt (drop=geo_id metro20)
+    Census.response_rates_2010_was20_regcnt (drop=geo_id metro20 sumlevel state fips_county)
     Tracts_2010_min_max (keep=county fsrr2010:)
     Tracts_2020_min_max (keep=county crrall: crrint:);
   by county;
@@ -77,5 +76,56 @@ data Tables;
   
 run;
 
-proc print;
+proc sort data=Tables_county;
+  by descending crrall;
 run;
+
+
+** Make tables **;
+
+options nodate nonumber;
+options orientation=portrait;
+
+%fdate()
+
+ods listing close;
+ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Response_rate_tables.rtf" style=Styles.Rtf_arial_9pt;
+
+footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
+
+title2 ' ';
+
+
+title3 "County-level census self-response rates, Washington, DC MSA - 2010 and 2020";
+
+proc tabulate data=Tables_county format=comma10.1 noseps missing;
+  class county /order=data;
+  var crrall crrint fsrr2010 crrall_min crrall_max;
+  table 
+    /** Rows **/
+    county=' ',
+    /** Columns **/
+    sum='2020 \line Self-response rates (%)' * (
+      crrall='Overall' 
+      crrint='Internet only' 
+    )
+    sum='2010 \line Self-response rates (%)' * (
+      fsrr2010='Overall' 
+    )
+    sum='2020 \line Tract\~self-response ranges (%)' * (
+      crrall_max='Highest tract' 
+      crrall_min='Lowest tract' 
+    )
+  ;
+run;
+
+
+
+ods rtf close;
+ods listing;
+
+title2;
+footnote1;
+
+
