@@ -20,6 +20,11 @@
 %DCData_lib( Ncdb )
 %DCData_lib( Census )
 
+%global URBAN_COLOR_CYAN URBAN_COLOR_GRAY;
+
+%let URBAN_COLOR_CYAN = "cx00aeef";
+%let URBAN_COLOR_GRAY = "cx9d9fa2";
+
 %global var2000 var2010 var2020;
 
 %let var2000 = 
@@ -227,7 +232,7 @@ options orientation=portrait;
 %fdate()
 
 ods listing close;
-ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_region_tables.rtf" style=Styles.Rtf_arial_9pt;
+ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_region_tables.rtf" style=Styles.Rtf_lato_9pt;
 
 footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
 footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
@@ -238,14 +243,23 @@ title2 ' ';
 title3 "Population by Race/Ethnicity, Washington, DC MSA - 2000 to 2020";
 
 proc tabulate data=RaceSummary format=comma10.0 noseps missing;
-  class year ucounty;
+  class year ucounty /order=formatted;
   var SHRD SHRNHBN SHRNHWN SHRHSPN SHRNHAN SHRNHIN SHRNHON MRANHSN;
   table 
-    /** Pages **/
-    all='Washington, DC MSA' ucounty=' ',
     /** Rows **/
-    SHRD='\b TOTAL' SHRNHWN='NH White' SHRNHBN='NH Black' SHRHSPN='Hispanic/Latinx' SHRNHAN='NH Asian/PI' 
-    SHRNHIN='NH Am. Indian' SHRNHON='NH Other Race' MRANHSN='\line NH Multiracial',
+    SHRD='\b TOTAL' SHRHSPN='Hispanic/Latinx' SHRNHIN='NH Am. Indian & AK Native' SHRNHAN='NH Asian & Pac. Islander'
+    SHRNHBN='NH Black' SHRNHON='NH Some other race' SHRNHWN='NH White' MRANHSN='\line NH Multiracial',
+    /** Columns **/
+    sum='Population' * year=' '
+    pctsum<SHRD>='% Population' * f=comma8.1 * year=' '
+    / condense
+  ;
+  table 
+    /** Pages **/
+    ucounty=' ',
+    /** Rows **/
+    SHRD='\b TOTAL' SHRHSPN='Hispanic/Latinx' SHRNHIN='NH Am. Indian & AK Native' SHRNHAN='NH Asian & Pac. Islander'
+    SHRNHBN='NH Black' SHRNHON='NH Some other race' SHRNHWN='NH White' MRANHSN='\line NH Multiracial',
     /** Columns **/
     sum='Population' * year=' '
     pctsum<SHRD>='% Population' * f=comma8.1 * year=' '
@@ -257,11 +271,19 @@ run;
 title3 "Child and Adult Population, Washington, DC MSA - 2000 to 2020";
 
 proc tabulate data=AgeSummary format=comma10.0 noseps missing;
-  class year ucounty;
+  class year ucounty /order=formatted;
   var TRCTPOP ADULTN CHILDN;
   table 
+    /** Rows **/
+    TRCTPOP='\b TOTAL' CHILDN='Children under 18' ADULTN='Adults 18+',
+    /** Columns **/
+    sum='Population' * year=' '
+    pctsum<TRCTPOP>='% Population' * f=comma8.1 * year=' '
+    / condense
+  ;
+  table 
     /** Pages **/
-    all='Washington, DC MSA' ucounty=' ',
+    ucounty=' ',
     /** Rows **/
     TRCTPOP='\b TOTAL' CHILDN='Children under 18' ADULTN='Adults 18+',
     /** Columns **/
@@ -275,7 +297,7 @@ run;
 title3 "Population, Housing Unit, and Household Counts - 2010 vs. 2020";
 
 proc tabulate data=Table format=comma10.0 noseps missing;
-  class ucounty;
+  class ucounty /order=formatted;
   var TRCTPOP1 TOTHSUN1 OCCHU1 TRCTPOP2 TOTHSUN2 OCCHU2 trctpop_chg tothsun_chg occhu_chg;
   table 
     /** Rows **/
@@ -305,7 +327,7 @@ run;
 title3 "Population, Housing Unit, and Household Distribution by Jurisdiction - 2000 to 2020";
 
 proc tabulate data=Table format=comma10.0 noseps missing;
-  class ucounty;
+  class ucounty /order=formatted;
   var TRCTPOP0 TRCTPOP1 TOTHSUN0 TOTHSUN1 OCCHU0 OCCHU1 TRCTPOP2 TOTHSUN2 OCCHU2 trctpop_chg tothsun_chg occhu_chg;
   table 
     /** Rows **/
@@ -334,35 +356,50 @@ run;
 title3 "Population by Race/Ethnicity Distribution by Jurisdiction - 2000 to 2020";
 
 proc tabulate data=Table format=comma10.0 noseps missing;
-  class ucounty;
-  var SHRNHB0N SHRNHB1N SHRNHB2N SHRNHW0N SHRNHW1N SHRNHW2N SHRHSP0N SHRHSP1N SHRHSP2N SHRNHA0N SHRNHA1N SHRNHA2N;
+  class ucounty /order=formatted;
+  var SHRNHB0N SHRNHB1N SHRNHB2N SHRNHW0N SHRNHW1N SHRNHW2N SHRHSP0N SHRHSP1N SHRHSP2N SHRNHA0N SHRNHA1N SHRNHA2N
+      SHRNHI0N SHRNHI1N SHRNHI2N SHRNHO0N SHRNHO1N SHRNHO2N;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='NH White Population' * ( SHRNHW0N="2000" SHRNHW1N="2010" SHRNHW2N="2020" )
-    colpctsum='% NH White Population' * f=comma8.1 * ( SHRNHW0N="2000" SHRNHW1N="2010" SHRNHW2N="2020" )
+    sum='Hispanic/Latinx population' * ( SHRHSP0N="2000" SHRHSP1N="2010" SHRHSP2N="2020" )
+    colpctsum='% Hispanic/Latinx population' * f=comma8.1 * ( SHRHSP0N="2000" SHRHSP1N="2010" SHRHSP2N="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='NH Black Population' * ( SHRNHB0N="2000" SHRNHB1N="2010" SHRNHB2N="2020" )
-    colpctsum='% NH Black Population' * f=comma8.1 * ( SHRNHB0N="2000" SHRNHB1N="2010" SHRNHB2N="2020" )
+    sum='NH Am. Indian & AK Native population' * ( SHRNHI0N="2000" SHRNHI1N="2010" SHRNHI2N="2020" )
+    colpctsum='% NH Am. Indian & AK Native population' * f=comma8.1 * ( SHRNHI0N="2000" SHRNHI1N="2010" SHRNHI2N="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='Hispanic/Latinx Population' * ( SHRHSP0N="2000" SHRHSP1N="2010" SHRHSP2N="2020" )
-    colpctsum='% Hispanic/Latinx Population' * f=comma8.1 * ( SHRHSP0N="2000" SHRHSP1N="2010" SHRHSP2N="2020" )
+    sum='NH Asian & PI population' * ( SHRNHA0N="2000" SHRNHA1N="2010" SHRNHA2N="2020" )
+    colpctsum='% NH Asian/PI population' * f=comma8.1 * ( SHRNHA0N="2000" SHRNHA1N="2010" SHRNHA2N="2020" )
   ;
   table 
     /** Rows **/
     all='\b TOTAL' ucounty=' ',
     /** Columns **/
-    sum='NH Asian/PI Population' * ( SHRNHA0N="2000" SHRNHA1N="2010" SHRNHA2N="2020" )
-    colpctsum='% NH Asian/PI Population' * f=comma8.1 * ( SHRNHA0N="2000" SHRNHA1N="2010" SHRNHA2N="2020" )
+    sum='NH Black population' * ( SHRNHB0N="2000" SHRNHB1N="2010" SHRNHB2N="2020" )
+    colpctsum='% NH Black population' * f=comma8.1 * ( SHRNHB0N="2000" SHRNHB1N="2010" SHRNHB2N="2020" )
+  ;
+  table 
+    /** Rows **/
+    all='\b TOTAL' ucounty=' ',
+    /** Columns **/
+    sum='NH Some other race population' * ( SHRNHO0N="2000" SHRNHO1N="2010" SHRNHO2N="2020" )
+    colpctsum='% NH Some other race population' * f=comma8.1 * ( SHRNHO0N="2000" SHRNHO1N="2010" SHRNHO2N="2020" )
+  ;
+  table 
+    /** Rows **/
+    all='\b TOTAL' ucounty=' ',
+    /** Columns **/
+    sum='NH White population' * ( SHRNHW0N="2000" SHRNHW1N="2010" SHRNHW2N="2020" )
+    colpctsum='% NH White population' * f=comma8.1 * ( SHRNHW0N="2000" SHRNHW1N="2010" SHRNHW2N="2020" )
   ;
 run;
 
@@ -427,7 +464,7 @@ run;
 title3 "Minimum, Bridged, and Maximum Population by Race/Ethnicity Estimates - 2020";
 
 proc tabulate data=RaceBridgeSummary format=comma10.0 noseps missing;
-  class ucounty;
+  class ucounty /order=formatted;
   class type / preloadfmt order=data;
   var SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
   table 
@@ -435,9 +472,14 @@ proc tabulate data=RaceBridgeSummary format=comma10.0 noseps missing;
     all='Washington, DC MSA' ucounty=' ',
     /** Rows **/
     SHR2d='Total'
-    NHW2N='NH White' NHB2N='NH Black' NHA2N='NH Asian/PI' 
-    NHI2N='NH Am. Indian' NHO2N='NH Other Race' MRANHS2N='NH Multiracial'
-    SHRHSP2N='Hispanic/Latinx',
+    SHRHSP2N='Hispanic/Latinx'
+    NHI2N='NH Am. Indian & AK Native' 
+    NHA2N='NH Asian & PI' 
+    NHB2N='NH Black' 
+    MRANHS2N='NH Multiracial'
+    NHO2N='NH Some other race' 
+    NHW2N='NH White' 
+    ,
     /** Columns **/
     ( sum='Population' pctsum<SHR2D>='% Population' * f=comma10.1 ) * type=' '
     / condense
@@ -548,19 +590,19 @@ footnote1;
       %if &race ~= hsp %then %do;
         yerrorlower=min&race.n
         yerrorupper=max&race.n
+        errorbarattrs=(color=black thickness=1)
       %end;
-      markerattrs=(color=blue symbol=CircleFilled);
-    series x=year y=shr&race.n / lineattrs=(color=blue pattern=2);
-    xaxis display=(nolabel);
-    yaxis display=(nolabel) min=0 max=3000000;
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled);
+    series x=year y=shr&race.n  / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
+    xaxis display=(nolabel) valueattrs=(color=black family="Lato");
+    yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0 max=3000000;
     label &geo = "&geolabel";
     %if %length( &st ) > 0 %then %do;
-      title1 "&racelabel Population, %upcase(&st)";
+      title1 color=black font="Lato" "&racelabel Population, %upcase(&st)";
     %end;
     %else %do;
-      title1 "&racelabel Population";
+      title1 color=black font="Lato" "&racelabel Population";
     %end;    
-    title2 "Greater DC Region";
   run;
   
   %if %mparam_is_yes( &pagebreak ) %then %do;
@@ -575,19 +617,19 @@ footnote1;
       %if &race ~= hsp %then %do;
         yerrorlower=min&race.
         yerrorupper=max&race.
+        errorbarattrs=(color=black thickness=1)
       %end;
-      markerattrs=(color=blue symbol=CircleFilled);
-    series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
-    xaxis display=(nolabel);
-    yaxis display=(nolabel) min=0 max=0.6;
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled);
+    series x=year y=shr&race. / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
+    xaxis display=(nolabel) valueattrs=(color=black family="Lato");
+    yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0 max=0.6;
     label &geo = "&geolabel";
     %if %length( &st ) > 0 %then %do;
-      title1 "Pct. &racelabel Population, %upcase(&st)";
+      title1 color=black font="Lato" "Pct. &racelabel Population, %upcase(&st)";
     %end;
     %else %do;
-      title1 "Pct. &racelabel Population";
+      title1 color=black font="Lato" "Pct. &racelabel Population";
     %end;    
-    title2 "Greater DC Region";
   run;
   
   %if %mparam_is_yes( &pagebreak ) %then %do;
@@ -607,26 +649,24 @@ proc summary data=Table nway;
   output out=Table_sum sum=;
 run;
 
-options nodate number;
+options nodate nonumber;
 options orientation=portrait;
 
 ods listing close;
 ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_region_charts.pdf" notoc nogfootnote;
 
-footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+/*footnote1 font="Lato" height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";*/
 
-  ods graphics on / width=2.666667in height=2in;
+ods graphics on / width=2.666667in height=2in;
 
-  ods pdf columns=3 startpage=never;
-  
+ods pdf columns=3 startpage=never;
 
-
-%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhw, racelabel=Non-Hisp. White, pagebreak=n )
-%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhb, racelabel=Non-Hisp. Black, pagebreak=n )
 %Scatter_plot( st=, geo=metro20, geolabel=MSA, race=hsp, racelabel=Hispanic/Latinx, pagebreak=n )
-%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nha, racelabel=Non-Hisp. Asian/PI, pagebreak=n )
-%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhi, racelabel=Non-Hisp. Am. Indian, pagebreak=n )
-%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nho, racelabel=Non-Hisp. Other race, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhi, racelabel=Non-Hisp. Am. Indian & AK Native, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nha, racelabel=Non-Hisp. Asian & PI, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhb, racelabel=Non-Hisp. Black, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nho, racelabel=Non-Hisp. Some other race, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhw, racelabel=Non-Hisp. White, pagebreak=n )
 
 ods pdf close;
 ods listing;
