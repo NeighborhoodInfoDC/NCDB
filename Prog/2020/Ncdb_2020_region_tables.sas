@@ -20,10 +20,17 @@
 %DCData_lib( Ncdb )
 %DCData_lib( Census )
 
-%global URBAN_COLOR_CYAN URBAN_COLOR_GRAY;
+%** Urban chart colors **;
 
-%let URBAN_COLOR_CYAN = "cx00aeef";
-%let URBAN_COLOR_GRAY = "cx9d9fa2";
+%global URBAN_COLOR_CYAN URBAN_COLOR_GOLD URBAN_COLOR_BLACK URBAN_COLOR_GRAY
+        URBAN_COLOR_MAGENTA URBAN_COLOR_GREEN;
+
+%let URBAN_COLOR_CYAN = "cx1696d2";
+%let URBAN_COLOR_GOLD = "cxfdbf11";
+%let URBAN_COLOR_BLACK = "cx000000";
+%let URBAN_COLOR_GRAY = "cxd2d2d2";
+%let URBAN_COLOR_MAGENTA = "cxec008b";
+%let URBAN_COLOR_GREEN = "cx558748";
 
 %global var2000 var2010 var2020;
 
@@ -650,14 +657,14 @@ proc summary data=Table nway;
 run;
 
 options nodate nonumber;
-options orientation=portrait;
+options orientation=portrait leftmargin=0.5in rightmargin=0.5in topmargin=0.5in bottommargin=0.5in;
 
 ods listing close;
 ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_region_charts.pdf" notoc nogfootnote;
 
 /*footnote1 font="Lato" height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";*/
 
-ods graphics on / width=2.666667in height=2in;
+ods graphics on / width=2.5in height=2in;
 
 ods pdf columns=3 startpage=never;
 

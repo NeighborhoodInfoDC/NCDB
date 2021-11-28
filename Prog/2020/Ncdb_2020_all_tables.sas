@@ -20,6 +20,18 @@
 %DCData_lib( Ncdb )
 %DCData_lib( Census )
 
+%** Urban chart colors **;
+
+%global URBAN_COLOR_CYAN URBAN_COLOR_GOLD URBAN_COLOR_BLACK URBAN_COLOR_GRAY
+        URBAN_COLOR_MAGENTA URBAN_COLOR_GREEN;
+
+%let URBAN_COLOR_CYAN = "cx1696d2";
+%let URBAN_COLOR_GOLD = "cxfdbf11";
+%let URBAN_COLOR_BLACK = "cx000000";
+%let URBAN_COLOR_GRAY = "cxd2d2d2";
+%let URBAN_COLOR_MAGENTA = "cxec008b";
+%let URBAN_COLOR_GREEN = "cx558748";
+
 %global yra yrb yeara yearb var2000 var2010 var2020;
 
 %let yra = 1;
@@ -186,7 +198,7 @@ run;
   %fdate()
 
   ods listing close;
-  ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._tables.rtf" style=Styles.Rtf_arial_9pt;
+  ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._tables.rtf" style=Styles.Rtf_lato_9pt;
 
   footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
   footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
@@ -195,7 +207,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var TRCTPOP&yra TOTHSUN&yra OCCHU&yra TRCTPOP&yrb TOTHSUN&yrb OCCHU&yrb trctpop_chg tothsun_chg occhu_chg;
     table 
       /** Rows **/
@@ -211,7 +223,7 @@ run;
         TOTHSUN&yrb="&yearb"
       )
       pctsum<TOTHSUN&yra>='% Change' * tothsun_chg=' ' * f=comma8.1
-      sum='Occupied Housing Units' * (
+      sum='Households' * (
         OCCHU&yra="&yeara"
         OCCHU&yrb="&yearb"
       )
@@ -228,7 +240,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var SHR&yra.D SHRWHT&yra.N SHRBLK&yra.N SHRAMI&yra.N SHRASN&yra.N SHRHIP&yra.N SHRAPI&yra.N SHROTH&yra.N 
         SHR&yrb.D SHRWHT&yrb.N SHRBLK&yrb.N SHRAMI&yrb.N SHRASN&yrb.N SHRHIP&yrb.N SHRAPI&yrb.N SHROTH&yrb.N;
     table 
@@ -236,18 +248,18 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        shrwht&yra.n='White'
+        shrami&yra.n='Am. Indian & AK\~Native'
+        shrapi&yra.n='Asian & PI'
         shrblk&yra.n='Black'
-        shrami&yra.n='Am. Indian'
-        shrapi&yra.n='Asian/PI'
-        shroth&yra.n='Other'
+        shroth&yra.n='Some other race'
+        shrwht&yra.n='White'
       )
       sum="&yearb" * ( 
-        shrwht&yrb.n='White'
+        shrami&yrb.n='Am. Indian & AK\~Native'
+        shrapi&yrb.n='Asian & PI'
         shrblk&yrb.n='Black'
-        shrami&yrb.n='Am. Indian'
-        shrapi&yrb.n='Asian/PI'
-        shroth&yrb.n='Other'
+        shroth&yrb.n='Some other race'
+        shrwht&yrb.n='White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -260,7 +272,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var SHR&yra.D SHRNHW&yra.N SHRNHB&yra.N SHRNHI&yra.N SHRNHR&yra.N SHRNHH&yra.N SHRNHA&yra.N SHRNHO&yra.N SHRHSP&yra.N  
         SHR&yrb.D SHRNHW&yrb.N SHRNHB&yrb.N SHRNHI&yrb.N SHRNHR&yrb.N SHRNHH&yrb.N SHRNHA&yrb.N SHRNHO&yrb.N SHRHSP&yrb.N;
     table 
@@ -268,20 +280,20 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        shrnhw&yra.n='NH White'
-        shrnhb&yra.n='NH Black'
-        shrnhi&yra.n='NH Am. Indian'
-        shrnha&yra.n='NH Asian/PI'
-        shrnho&yra.n='NH Other'
         shrhsp&yra.n='Hispanic'
+        shrnhi&yra.n='NH Am. Indian & AK\~Native'
+        shrnha&yra.n='NH Asian & PI'
+        shrnhb&yra.n='NH Black'
+        shrnho&yra.n='NH Some other race'
+        shrnhw&yra.n='NH White'
       )
       sum="&yearb" * ( 
-        shrnhw&yrb.n='NH White'
-        shrnhb&yrb.n='NH Black'
-        shrnhi&yrb.n='NH Am. Indian'
-        shrnha&yrb.n='NH Asian/PI'
-        shrnho&yrb.n='NH Other'
         shrhsp&yrb.n='Hispanic'
+        shrnhi&yrb.n='NH Am. Indian & AK\~Native'
+        shrnha&yrb.n='NH Asian & PI'
+        shrnhb&yrb.n='NH Black'
+        shrnho&yrb.n='NH Some other race'
+        shrnhw&yrb.n='NH White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -294,7 +306,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d minWHT&yra.N minBLK&yra.N minAMI&yra.N minASN&yra.N minHIP&yra.N minAPI&yra.N minOTH&yra.N MRAPOP&yra.N
         shr&yrb.d minWHT&yrb.N minBLK&yrb.N minAMI&yrb.N minASN&yrb.N minHIP&yrb.N minAPI&yrb.N minOTH&yrb.N MRAPOP&yrb.N;
     table 
@@ -302,20 +314,20 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        minwht&yra.n='White alone'
+        minami&yra.n='Am. Indian & AK\~Native alone'
+        minapi&yra.n='Asian & PI alone'
         minblk&yra.n='Black alone'
-        minami&yra.n='Am. Indian alone'
-        minapi&yra.n='Asian/PI alone'
-        minoth&yra.n='Other alone'
         mrapop&yra.n='Multiracial'
+        minoth&yra.n='Some other race alone'
+        minwht&yra.n='White alone'
       )
       sum="&yearb" * ( 
-        minwht&yrb.n='White alone'
+        minami&yrb.n='Am. Indian & AK\~Native alone'
+        minapi&yrb.n='Asian & PI alone'
         minblk&yrb.n='Black alone'
-        minami&yrb.n='Am. Indian alone'
-        minapi&yrb.n='Asian/PI alone'
-        minoth&yrb.n='Other alone'
         mrapop&yrb.n='Multiracial'
+        minoth&yrb.n='Some other race alone'
+        minwht&yrb.n='White alone'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -328,7 +340,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d minNHW&yra.N minNHB&yra.N minNHI&yra.N minNHR&yra.N minNHH&yra.N minNHA&yra.N minNHO&yra.N MRANHS&yra.N SHRHSP&yra.N  
         shr&yrb.d minNHW&yrb.N minNHB&yrb.N minNHI&yrb.N minNHR&yrb.N minNHH&yrb.N minNHA&yrb.N minNHO&yrb.N MRANHS&yrb.N SHRHSP&yrb.N;
     table 
@@ -336,22 +348,22 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        minnhw&yra.n='NH White alone'
-        minnhb&yra.n='NH Black alone'
-        minnhi&yra.n='NH Am. Indian alone'
-        minnha&yra.n='NH Asian/PI alone'
-        minnho&yra.n='NH Other alone'
-        mranhs&yra.n='NH Multiracial'
         shrhsp&yra.n='Hispanic'
+        minnhi&yra.n='NH Am. Indian & AK\~Native alone'
+        minnha&yra.n='NH Asian & PI alone'
+        minnhb&yra.n='NH Black alone'
+        mranhs&yra.n='NH Multiracial'
+        minnho&yra.n='NH Some other race alone'
+        minnhw&yra.n='NH White alone'
       )
       sum="&yearb" * ( 
-        minnhw&yrb.n='NH White alone'
-        minnhb&yrb.n='NH Black alone'
-        minnhi&yrb.n='NH Am. Indian alone'
-        minnha&yrb.n='NH Asian/PI alone'
-        minnho&yrb.n='NH Other alone'
-        mranhs&yrb.n='NH Multiracial'
         shrhsp&yrb.n='Hispanic'
+        minnhi&yrb.n='NH Am. Indian & AK\~Native alone'
+        minnha&yrb.n='NH Asian & PI alone'
+        minnhb&yrb.n='NH Black alone'
+        mranhs&yrb.n='NH Multiracial'
+        minnho&yrb.n='NH Some other race alone'
+        minnhw&yrb.n='NH White alone'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -364,7 +376,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d maxWHT&yra.N maxBLK&yra.N maxAMI&yra.N maxASN&yra.N maxHIP&yra.N maxAPI&yra.N maxOTH&yra.N
         shr&yrb.d maxWHT&yrb.N maxBLK&yrb.N maxAMI&yrb.N maxASN&yrb.N maxHIP&yrb.N maxAPI&yrb.N maxOTH&yrb.N;
     table 
@@ -372,18 +384,18 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        maxwht&yra.n='White'
+        maxami&yra.n='Am. Indian & AK\~Native'
+        maxapi&yra.n='Asian & PI'
         maxblk&yra.n='Black'
-        maxami&yra.n='Am. Indian'
-        maxapi&yra.n='Asian/PI'
-        maxoth&yra.n='Other'
+        maxoth&yra.n='Some other race'
+        maxwht&yra.n='White'
       )
       sum="&yearb" * ( 
-        maxwht&yrb.n='White'
+        maxami&yrb.n='Am. Indian & AK\~Native'
+        maxapi&yrb.n='Asian & PI'
         maxblk&yrb.n='Black'
-        maxami&yrb.n='Am. Indian'
-        maxapi&yrb.n='Asian/PI'
-        maxoth&yrb.n='Other'
+        maxoth&yrb.n='Some other race'
+        maxwht&yrb.n='White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -397,7 +409,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d maxNHW&yra.N maxNHB&yra.N maxNHI&yra.N maxNHR&yra.N maxNHH&yra.N maxNHA&yra.N maxNHO&yra.N SHRHSP&yra.N  
         shr&yrb.d maxNHW&yrb.N maxNHB&yrb.N maxNHI&yrb.N maxNHR&yrb.N maxNHH&yrb.N maxNHA&yrb.N maxNHO&yrb.N SHRHSP&yrb.N;
     table 
@@ -405,20 +417,20 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        maxnhw&yra.n='NH White'
-        maxnhb&yra.n='NH Black'
-        maxnhi&yra.n='NH Am. Indian'
-        maxnha&yra.n='NH Asian/PI'
-        maxnho&yra.n='NH Other'
         shrhsp&yra.n='Hispanic'
+        maxnhi&yra.n='NH Am. Indian & AK\~Native'
+        maxnha&yra.n='NH Asian & PI'
+        maxnhb&yra.n='NH Black'
+        maxnho&yra.n='NH Some other race'
+        maxnhw&yra.n='NH White'
       )
       sum="&yearb" * ( 
-        maxnhw&yrb.n='NH White'
-        maxnhb&yrb.n='NH Black'
-        maxnhi&yrb.n='NH Am. Indian'
-        maxnha&yrb.n='NH Asian/PI'
-        maxnho&yrb.n='NH Other'
         shrhsp&yrb.n='Hispanic'
+        maxnhi&yrb.n='NH Am. Indian & AK\~Native'
+        maxnha&yrb.n='NH Asian & PI'
+        maxnhb&yrb.n='NH Black'
+        maxnho&yrb.n='NH Some other race'
+        maxnhw&yrb.n='NH White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -432,7 +444,7 @@ run;
 
   proc tabulate data=Table format=comma10.0 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var TRCTPOP&yra child&yra.n adult&yra.n TRCTPOP&yrb child&yrb.n adult&yrb.n;
     table 
       /** Rows **/
@@ -462,7 +474,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var SHR&yra.D SHRWHT&yra.N SHRBLK&yra.N SHRAMI&yra.N SHRASN&yra.N SHRHIP&yra.N SHRAPI&yra.N SHROTH&yra.N 
         SHR&yrb.D SHRWHT&yrb.N SHRBLK&yrb.N SHRAMI&yrb.N SHRASN&yrb.N SHRHIP&yrb.N SHRAPI&yrb.N SHROTH&yrb.N;
     table 
@@ -470,18 +482,18 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        shrwht&yra.n='White'
+        shrami&yra.n='Am. Indian & AK\~Native'
+        shrapi&yra.n='Asian & PI'
         shrblk&yra.n='Black'
-        shrami&yra.n='Am. Indian'
-        shrapi&yra.n='Asian/PI'
-        shroth&yra.n='Other'
+        shroth&yra.n='Some other race'
+        shrwht&yra.n='White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        shrwht&yrb.n='White'
+        shrami&yrb.n='Am. Indian & AK\~Native'
+        shrapi&yrb.n='Asian & PI'
         shrblk&yrb.n='Black'
-        shrami&yrb.n='Am. Indian'
-        shrapi&yrb.n='Asian/PI'
-        shroth&yrb.n='Other'
+        shroth&yrb.n='Some other race'
+        shrwht&yrb.n='White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -494,7 +506,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var SHR&yra.D SHRNHW&yra.N SHRNHB&yra.N SHRNHI&yra.N SHRNHR&yra.N SHRNHH&yra.N SHRNHA&yra.N SHRNHO&yra.N SHRHSP&yra.N  
         SHR&yrb.D SHRNHW&yrb.N SHRNHB&yrb.N SHRNHI&yrb.N SHRNHR&yrb.N SHRNHH&yrb.N SHRNHA&yrb.N SHRNHO&yrb.N SHRHSP&yrb.N;
     table 
@@ -502,20 +514,20 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        shrnhw&yra.n='NH White'
-        shrnhb&yra.n='NH Black'
-        shrnhi&yra.n='NH Am. Indian'
-        shrnha&yra.n='NH Asian/PI'
-        shrnho&yra.n='NH Other'
         shrhsp&yra.n='Hispanic'
+        shrnhi&yra.n='NH Am. Indian & AK\~Native'
+        shrnha&yra.n='NH Asian & PI'
+        shrnhb&yra.n='NH Black'
+        shrnho&yra.n='NH Some other race'
+        shrnhw&yra.n='NH White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        shrnhw&yrb.n='NH White'
-        shrnhb&yrb.n='NH Black'
-        shrnhi&yrb.n='NH Am. Indian'
-        shrnha&yrb.n='NH Asian/PI'
-        shrnho&yrb.n='NH Other'
         shrhsp&yrb.n='Hispanic'
+        shrnhi&yrb.n='NH Am. Indian & AK\~Native'
+        shrnha&yrb.n='NH Asian & PI'
+        shrnhb&yrb.n='NH Black'
+        shrnho&yrb.n='NH Some other race'
+        shrnhw&yrb.n='NH White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -528,7 +540,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d minWHT&yra.N minBLK&yra.N minAMI&yra.N minASN&yra.N minHIP&yra.N minAPI&yra.N minOTH&yra.N MRAPOP&yra.N
         shr&yrb.d minWHT&yrb.N minBLK&yrb.N minAMI&yrb.N minASN&yrb.N minHIP&yrb.N minAPI&yrb.N minOTH&yrb.N MRAPOP&yrb.N;
     table 
@@ -536,20 +548,20 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        minwht&yra.n='White alone'
+        minami&yra.n='Am. Indian & AK\~Native alone'
+        minapi&yra.n='Asian & PI alone'
         minblk&yra.n='Black alone'
-        minami&yra.n='Am. Indian alone'
-        minapi&yra.n='Asian/PI alone'
-        minoth&yra.n='Other alone'
         mrapop&yra.n='Multiracial'
+        minoth&yra.n='Some other race alone'
+        minwht&yra.n='White alone'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        minwht&yrb.n='White alone'
+        minami&yrb.n='Am. Indian & AK\~Native alone'
+        minapi&yrb.n='Asian & PI alone'
         minblk&yrb.n='Black alone'
-        minami&yrb.n='Am. Indian alone'
-        minapi&yrb.n='Asian/PI alone'
-        minoth&yrb.n='Other alone'
         mrapop&yrb.n='Multiracial'
+        minoth&yrb.n='Some other race alone'
+        minwht&yrb.n='White alone'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -562,7 +574,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d minNHW&yra.N minNHB&yra.N minNHI&yra.N minNHR&yra.N minNHH&yra.N minNHA&yra.N minNHO&yra.N MRANHS&yra.N SHRHSP&yra.N  
         shr&yrb.d minNHW&yrb.N minNHB&yrb.N minNHI&yrb.N minNHR&yrb.N minNHH&yrb.N minNHA&yrb.N minNHO&yrb.N MRANHS&yrb.N SHRHSP&yrb.N;
     table 
@@ -570,22 +582,22 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        minnhw&yra.n='NH White alone'
-        minnhb&yra.n='NH Black alone'
-        minnhi&yra.n='NH Am. Indian alone'
-        minnha&yra.n='NH Asian/PI alone'
-        minnho&yra.n='NH Other alone'
-        mranhs&yra.n='NH Multiracial'
         shrhsp&yra.n='Hispanic'
+        minnhi&yra.n='NH Am. Indian & AK\~Native alone'
+        minnha&yra.n='NH Asian & PI alone'
+        minnhb&yra.n='NH Black alone'
+        mranhs&yra.n='NH Multiracial'
+        minnho&yra.n='NH Some other race alone'
+        minnhw&yra.n='NH White alone'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        minnhw&yrb.n='NH White alone'
-        minnhb&yrb.n='NH Black alone'
-        minnhi&yrb.n='NH Am. Indian alone'
-        minnha&yrb.n='NH Asian/PI alone'
-        minnho&yrb.n='NH Other alone'
-        mranhs&yrb.n='NH Multiracial'
         shrhsp&yrb.n='Hispanic'
+        minnhi&yrb.n='NH Am. Indian & AK\~Native alone'
+        minnha&yrb.n='NH Asian & PI alone'
+        minnhb&yrb.n='NH Black alone'
+        mranhs&yrb.n='NH Multiracial'
+        minnho&yrb.n='NH Some other race alone'
+        minnhw&yrb.n='NH White alone'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -598,7 +610,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d maxWHT&yra.N maxBLK&yra.N maxAMI&yra.N maxASN&yra.N maxHIP&yra.N maxAPI&yra.N maxOTH&yra.N
         shr&yrb.d maxWHT&yrb.N maxBLK&yrb.N maxAMI&yrb.N maxASN&yrb.N maxHIP&yrb.N maxAPI&yrb.N maxOTH&yrb.N;
     table 
@@ -606,18 +618,18 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        maxwht&yra.n='White'
+        maxami&yra.n='Am. Indian & AK\~Native'
+        maxapi&yra.n='Asian & PI'
         maxblk&yra.n='Black'
-        maxami&yra.n='Am. Indian'
-        maxapi&yra.n='Asian/PI'
-        maxoth&yra.n='Other'
+        maxoth&yra.n='Some other race'
+        maxwht&yra.n='White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        maxwht&yrb.n='White'
+        maxami&yrb.n='Am. Indian & AK\~Native'
+        maxapi&yrb.n='Asian & PI'
         maxblk&yrb.n='Black'
-        maxami&yrb.n='Am. Indian'
-        maxapi&yrb.n='Asian/PI'
-        maxoth&yrb.n='Other'
+        maxoth&yrb.n='Some other race'
+        maxwht&yrb.n='White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -631,7 +643,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var shr&yra.d maxNHW&yra.N maxNHB&yra.N maxNHI&yra.N maxNHR&yra.N maxNHH&yra.N maxNHA&yra.N maxNHO&yra.N SHRHSP&yra.N  
         shr&yrb.d maxNHW&yrb.N maxNHB&yrb.N maxNHI&yrb.N maxNHR&yrb.N maxNHH&yrb.N maxNHA&yrb.N maxNHO&yrb.N SHRHSP&yrb.N;
     table 
@@ -639,20 +651,20 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        maxnhw&yra.n='NH White'
-        maxnhb&yra.n='NH Black'
-        maxnhi&yra.n='NH Am. Indian'
-        maxnha&yra.n='NH Asian/PI'
-        maxnho&yra.n='NH Other'
         shrhsp&yra.n='Hispanic'
+        maxnhi&yra.n='NH Am. Indian & AK\~Native'
+        maxnha&yra.n='NH Asian & PI'
+        maxnhb&yra.n='NH Black'
+        maxnho&yra.n='NH Some other race'
+        maxnhw&yra.n='NH White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        maxnhw&yrb.n='NH White'
-        maxnhb&yrb.n='NH Black'
-        maxnhi&yrb.n='NH Am. Indian'
-        maxnha&yrb.n='NH Asian/PI'
-        maxnho&yrb.n='NH Other'
         shrhsp&yrb.n='Hispanic'
+        maxnhi&yrb.n='NH Am. Indian & AK\~Native'
+        maxnha&yrb.n='NH Asian & PI'
+        maxnhb&yrb.n='NH Black'
+        maxnho&yrb.n='NH Some other race'
+        maxnhw&yrb.n='NH White'
       )
       / box="%upcase(&st) by &geolabel"
     ;
@@ -666,7 +678,7 @@ run;
 
   proc tabulate data=Table format=comma8.1 noseps missing;
     where _type_ = 1;
-    class &geo;
+    class &geo /order=formatted;
     var TRCTPOP&yra child&yra.n adult&yra.n TRCTPOP&yrb child&yrb.n adult&yrb.n;
     table 
       /** Rows **/
@@ -694,12 +706,12 @@ run;
   title1;
   footnote1;
   
-  options nodate number;
-  options orientation=portrait;
+  options nodate nonumber;
+  options orientation=portrait leftmargin=0.5in rightmargin=0.5in topmargin=0.5in bottommargin=0.5in;
 
   ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" notoc nogfootnote;
   
-  footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+  /**footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";**/
   
   ** Donut charts **;
   
@@ -749,7 +761,7 @@ run;
     by descending _type_ &geo;
   run;
   
-  ods graphics on / width=2.666667in height=2in;
+  ods graphics on / width=2.5in height=2in;
 
   ods pdf columns=3 startpage=never;
 
@@ -766,11 +778,12 @@ run;
       where _type_ = 1;
     %end;
     by &geo notsorted;
+    styleattrs datacolors=(&URBAN_COLOR_CYAN &URBAN_COLOR_GOLD);
     vbar year / group=age groupdisplay=stack freq=pop stat=percent;
-    xaxis display=(nolabel);
-    yaxis display=(nolabel);
+    xaxis display=(nolabel) valueattrs=(color=black family="Lato");
+    yaxis display=(nolabel) valueattrs=(color=black family="Lato");
     label &geo = "&geolabel" age="Age";
-    title1 "Pct. Adult vs. Child Population, %upcase(&st)";
+    title1 color=black font="Lato" "Pct. Adult vs. Child Population, %upcase(&st)";
   run;
   
     ods pdf columns=1 startpage=now;
@@ -778,12 +791,12 @@ run;
 
   ** Scatter plots **;
   
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=Non-Hisp. White )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=Non-Hisp. Black )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=hsp, racelabel=Hispanic/Latinx )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=Non-Hisp. Asian/PI )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=Non-Hisp. Am. Indian )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=Non-Hisp. Other race )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=NH Am. Indian & AK Native )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=NH Asian & PI )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=NH Black )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=NH Some other race )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=NH White )
 
   ods pdf close;
   ods listing;
@@ -891,13 +904,14 @@ run;
       %if &race ~= hsp %then %do;
         yerrorlower=min&race.n
         yerrorupper=max&race.n
+        errorbarattrs=(color=black thickness=1)
       %end;
-      markerattrs=(color=blue symbol=CircleFilled);
-    series x=year y=shr&race.n / lineattrs=(color=blue pattern=2);
-    xaxis display=(nolabel);
-    yaxis display=(nolabel) min=0;
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled);
+    series x=year y=shr&race.n / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
+    xaxis display=(nolabel) valueattrs=(color=black family="Lato");
+    yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0;
     label &geo = "&geolabel";
-    title1 "&racelabel Population, %upcase(&st)";
+    title1 color=black font="Lato" "&racelabel Population, %upcase(&st)";
   run;
   
   %if &st ~= wv %then %do;
@@ -913,13 +927,14 @@ run;
       %if &race ~= hsp %then %do;
         yerrorlower=min&race.
         yerrorupper=max&race.
+        errorbarattrs=(color=black thickness=1)
       %end;
-      markerattrs=(color=blue symbol=CircleFilled);
-    series x=year y=shr&race. / lineattrs=(color=blue pattern=2);
-    xaxis display=(nolabel);
-    yaxis display=(nolabel) min=0;
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled);
+    series x=year y=shr&race. / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
+    xaxis display=(nolabel) valueattrs=(color=black family="Lato");
+    yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0;
     label &geo = "&geolabel";
-    title1 "Pct. &racelabel Population, %upcase(&st)";
+    title1 color=black font="Lato" "Pct. &racelabel Population, %upcase(&st)";
   run;
   
   %if &st ~= wv %then %do;
