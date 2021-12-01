@@ -228,10 +228,9 @@ run;
         OCCHU&yrb="&yearb"
       )
       pctsum<OCCHU&yra>='% Change' * occhu_chg=' ' * f=comma8.1
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "Population and Housing Unit Counts - &yeara vs. &yearb";
+    title3 "Population and Housing Unit Counts - &yeara vs. &yearb - %upcase(&st) by &geolabel";
   run;
 
   ********  COUNTS  ********;
@@ -251,20 +250,19 @@ run;
         shrami&yra.n='Am. Indian & AK\~Native'
         shrapi&yra.n='Asian & PI'
         shrblk&yra.n='Black'
-        shroth&yra.n='Some other race'
+        shroth&yra.n='Some Other Race'
         shrwht&yra.n='White'
       )
       sum="&yearb" * ( 
         shrami&yrb.n='Am. Indian & AK\~Native'
         shrapi&yrb.n='Asian & PI'
         shrblk&yrb.n='Black'
-        shroth&yrb.n='Some other race'
+        shroth&yrb.n='Some Other Race'
         shrwht&yrb.n='White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
+    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Population by Race';
   run;
 
@@ -280,25 +278,24 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        shrhsp&yra.n='Hispanic'
+        shrhsp&yra.n='Hispanic/Latinx'
         shrnhi&yra.n='NH Am. Indian & AK\~Native'
         shrnha&yra.n='NH Asian & PI'
         shrnhb&yra.n='NH Black'
-        shrnho&yra.n='NH Some other race'
+        shrnho&yra.n='NH Some Other Race'
         shrnhw&yra.n='NH White'
       )
       sum="&yearb" * ( 
-        shrhsp&yrb.n='Hispanic'
+        shrhsp&yrb.n='Hispanic/Latinx'
         shrnhi&yrb.n='NH Am. Indian & AK\~Native'
         shrnha&yrb.n='NH Asian & PI'
         shrnhb&yrb.n='NH Black'
-        shrnho&yrb.n='NH Some other race'
+        shrnho&yrb.n='NH Some Other Race'
         shrnhw&yrb.n='NH White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
+    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
   run;
 
@@ -318,7 +315,7 @@ run;
         minapi&yra.n='Asian & PI alone'
         minblk&yra.n='Black alone'
         mrapop&yra.n='Multiracial'
-        minoth&yra.n='Some other race alone'
+        minoth&yra.n='Some Other Race alone'
         minwht&yra.n='White alone'
       )
       sum="&yearb" * ( 
@@ -326,13 +323,12 @@ run;
         minapi&yrb.n='Asian & PI alone'
         minblk&yrb.n='Black alone'
         mrapop&yrb.n='Multiracial'
-        minoth&yrb.n='Some other race alone'
+        minoth&yrb.n='Some Other Race alone'
         minwht&yrb.n='White alone'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
+    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Population by Race';
   run;
 
@@ -348,27 +344,26 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        shrhsp&yra.n='Hispanic'
+        shrhsp&yra.n='Hispanic/Latinx'
         minnhi&yra.n='NH Am. Indian & AK\~Native alone'
         minnha&yra.n='NH Asian & PI alone'
         minnhb&yra.n='NH Black alone'
         mranhs&yra.n='NH Multiracial'
-        minnho&yra.n='NH Some other race alone'
+        minnho&yra.n='NH Some Other Race alone'
         minnhw&yra.n='NH White alone'
       )
       sum="&yearb" * ( 
-        shrhsp&yrb.n='Hispanic'
+        shrhsp&yrb.n='Hispanic/Latinx'
         minnhi&yrb.n='NH Am. Indian & AK\~Native alone'
         minnha&yrb.n='NH Asian & PI alone'
         minnhb&yrb.n='NH Black alone'
         mranhs&yrb.n='NH Multiracial'
-        minnho&yrb.n='NH Some other race alone'
+        minnho&yrb.n='NH Some Other Race alone'
         minnhw&yrb.n='NH White alone'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
+    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
   run;
 
@@ -387,20 +382,19 @@ run;
         maxami&yra.n='Am. Indian & AK\~Native'
         maxapi&yra.n='Asian & PI'
         maxblk&yra.n='Black'
-        maxoth&yra.n='Some other race'
+        maxoth&yra.n='Some Other Race'
         maxwht&yra.n='White'
       )
       sum="&yearb" * ( 
         maxami&yrb.n='Am. Indian & AK\~Native'
         maxapi&yrb.n='Asian & PI'
         maxblk&yrb.n='Black'
-        maxoth&yrb.n='Some other race'
+        maxoth&yrb.n='Some Other Race'
         maxwht&yrb.n='White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
+    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Population by Race';
     title5 'NOTE: Subgroups will not add to total population.';
   run;
@@ -417,25 +411,24 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       sum="&yeara" * (
-        shrhsp&yra.n='Hispanic'
+        shrhsp&yra.n='Hispanic/Latinx'
         maxnhi&yra.n='NH Am. Indian & AK\~Native'
         maxnha&yra.n='NH Asian & PI'
         maxnhb&yra.n='NH Black'
-        maxnho&yra.n='NH Some other race'
+        maxnho&yra.n='NH Some Other Race'
         maxnhw&yra.n='NH White'
       )
       sum="&yearb" * ( 
-        shrhsp&yrb.n='Hispanic'
+        shrhsp&yrb.n='Hispanic/Latinx'
         maxnhi&yrb.n='NH Am. Indian & AK\~Native'
         maxnha&yrb.n='NH Asian & PI'
         maxnhb&yrb.n='NH Black'
-        maxnho&yrb.n='NH Some other race'
+        maxnho&yrb.n='NH Some Other Race'
         maxnhw&yrb.n='NH White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
+    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
     title5 'NOTE: Subgroups will not add to total population.';
   run;
@@ -460,10 +453,9 @@ run;
         child&yrb.n='Children under 18'
         adult&yrb.n='Adults 18+'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "Child and Adult Population - &yeara vs. &yearb";
+    title3 "Child and Adult Population - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Persons';
   run;
 
@@ -485,20 +477,19 @@ run;
         shrami&yra.n='Am. Indian & AK\~Native'
         shrapi&yra.n='Asian & PI'
         shrblk&yra.n='Black'
-        shroth&yra.n='Some other race'
+        shroth&yra.n='Some Other Race'
         shrwht&yra.n='White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
         shrami&yrb.n='Am. Indian & AK\~Native'
         shrapi&yrb.n='Asian & PI'
         shrblk&yrb.n='Black'
-        shroth&yrb.n='Some other race'
+        shroth&yrb.n='Some Other Race'
         shrwht&yrb.n='White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
+    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Population by Race';
   run;
 
@@ -514,25 +505,24 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        shrhsp&yra.n='Hispanic'
+        shrhsp&yra.n='Hispanic/Latinx'
         shrnhi&yra.n='NH Am. Indian & AK\~Native'
         shrnha&yra.n='NH Asian & PI'
         shrnhb&yra.n='NH Black'
-        shrnho&yra.n='NH Some other race'
+        shrnho&yra.n='NH Some Other Race'
         shrnhw&yra.n='NH White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        shrhsp&yrb.n='Hispanic'
+        shrhsp&yrb.n='Hispanic/Latinx'
         shrnhi&yrb.n='NH Am. Indian & AK\~Native'
         shrnha&yrb.n='NH Asian & PI'
         shrnhb&yrb.n='NH Black'
-        shrnho&yrb.n='NH Some other race'
+        shrnho&yrb.n='NH Some Other Race'
         shrnhw&yrb.n='NH White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb";
+    title3 "NCDB Race Bridging Variables (SHR) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
   run;
 
@@ -552,7 +542,7 @@ run;
         minapi&yra.n='Asian & PI alone'
         minblk&yra.n='Black alone'
         mrapop&yra.n='Multiracial'
-        minoth&yra.n='Some other race alone'
+        minoth&yra.n='Some Other Race alone'
         minwht&yra.n='White alone'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
@@ -560,13 +550,12 @@ run;
         minapi&yrb.n='Asian & PI alone'
         minblk&yrb.n='Black alone'
         mrapop&yrb.n='Multiracial'
-        minoth&yrb.n='Some other race alone'
+        minoth&yrb.n='Some Other Race alone'
         minwht&yrb.n='White alone'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
+    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Population by Race';
   run;
 
@@ -582,27 +571,26 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        shrhsp&yra.n='Hispanic'
+        shrhsp&yra.n='Hispanic/Latinx'
         minnhi&yra.n='NH Am. Indian & AK\~Native alone'
         minnha&yra.n='NH Asian & PI alone'
         minnhb&yra.n='NH Black alone'
         mranhs&yra.n='NH Multiracial'
-        minnho&yra.n='NH Some other race alone'
+        minnho&yra.n='NH Some Other Race alone'
         minnhw&yra.n='NH White alone'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        shrhsp&yrb.n='Hispanic'
+        shrhsp&yrb.n='Hispanic/Latinx'
         minnhi&yrb.n='NH Am. Indian & AK\~Native alone'
         minnha&yrb.n='NH Asian & PI alone'
         minnhb&yrb.n='NH Black alone'
         mranhs&yrb.n='NH Multiracial'
-        minnho&yrb.n='NH Some other race alone'
+        minnho&yrb.n='NH Some Other Race alone'
         minnhw&yrb.n='NH White alone'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb";
+    title3 "NCDB Race Alone Variables (MIN) + Multiracial - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
   run;
 
@@ -621,20 +609,19 @@ run;
         maxami&yra.n='Am. Indian & AK\~Native'
         maxapi&yra.n='Asian & PI'
         maxblk&yra.n='Black'
-        maxoth&yra.n='Some other race'
+        maxoth&yra.n='Some Other Race'
         maxwht&yra.n='White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
         maxami&yrb.n='Am. Indian & AK\~Native'
         maxapi&yrb.n='Asian & PI'
         maxblk&yrb.n='Black'
-        maxoth&yrb.n='Some other race'
+        maxoth&yrb.n='Some Other Race'
         maxwht&yrb.n='White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
+    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Population by Race';
     title5 'NOTE: Percentages will not add to 100.';
   run;
@@ -651,25 +638,24 @@ run;
       all='\b TOTAL' &geo=' ',
       /** Columns **/
       pctsum<shr&yra.d>="&yeara" * (
-        shrhsp&yra.n='Hispanic'
+        shrhsp&yra.n='Hispanic/Latinx'
         maxnhi&yra.n='NH Am. Indian & AK\~Native'
         maxnha&yra.n='NH Asian & PI'
         maxnhb&yra.n='NH Black'
-        maxnho&yra.n='NH Some other race'
+        maxnho&yra.n='NH Some Other Race'
         maxnhw&yra.n='NH White'
       )
       pctsum<shr&yrb.d>="&yearb" * ( 
-        shrhsp&yrb.n='Hispanic'
+        shrhsp&yrb.n='Hispanic/Latinx'
         maxnhi&yrb.n='NH Am. Indian & AK\~Native'
         maxnha&yrb.n='NH Asian & PI'
         maxnhb&yrb.n='NH Black'
-        maxnho&yrb.n='NH Some other race'
+        maxnho&yrb.n='NH Some Other Race'
         maxnhw&yrb.n='NH White'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb";
+    title3 "NCDB Race Alone or in Combination Variables (MAX) - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
     title5 'NOTE: Percentages will not add to 100.';
   run;
@@ -694,10 +680,9 @@ run;
         child&yrb.n='Children under 18'
         adult&yrb.n='Adults 18+'
       )
-      / box="%upcase(&st) by &geolabel"
     ;
     title2 ' ';
-    title3 "Child and Adult Population - &yeara vs. &yearb";
+    title3 "Child and Adult Population - &yeara vs. &yearb - %upcase(&st) by &geolabel";
     title4 'Percent Persons';
   run;
   
@@ -783,7 +768,12 @@ run;
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato");
     label &geo = "&geolabel" age="Age";
-    title1 color=black font="Lato" "Pct. Adult vs. Child Population, %upcase(&st)";
+    %if &st = dc %then %do;
+      title1 color=black font="Lato" "Pct. Adult vs. Child Population, %upcase(&st)";
+    %end;
+    %else %do;
+      title1 color=black font="Lato" "Pct. Adult vs. Child Population";
+    %end;
   run;
   
     ods pdf columns=1 startpage=now;
@@ -795,7 +785,7 @@ run;
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=NH Am. Indian & AK Native )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=NH Asian & PI )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=NH Black )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=NH Some other race )
+  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=NH Some Other Race )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=NH White )
 
   ods pdf close;
@@ -911,7 +901,12 @@ run;
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0;
     label &geo = "&geolabel";
-    title1 color=black font="Lato" "&racelabel Population, %upcase(&st)";
+    %if &st = dc %then %do;
+      title1 color=black font="Lato" "&racelabel Population, %upcase(&st)";
+    %end;
+    %else %do;
+      title1 color=black font="Lato" "&racelabel Population";
+    %end;
   run;
   
   %if &st ~= wv %then %do;
@@ -934,7 +929,12 @@ run;
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0;
     label &geo = "&geolabel";
-    title1 color=black font="Lato" "Pct. &racelabel Population, %upcase(&st)";
+    %if &st = dc %then %do;
+      title1 color=black font="Lato" "Pct. &racelabel Population, %upcase(&st)";
+    %end;
+    %else %do;
+      title1 color=black font="Lato" "Pct. &racelabel Population";
+    %end;
   run;
   
   %if &st ~= wv %then %do;

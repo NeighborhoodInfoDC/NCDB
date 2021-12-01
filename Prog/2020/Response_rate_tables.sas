@@ -30,6 +30,8 @@ data Tracts_2010;
     Census.response_rates_2010_wv_tr20;
   by geo2020;
   
+  where put( county, $ctym20f. ) ~= '';
+
   keep state county geo2020 fsrr2010; 
 
 run;
@@ -51,9 +53,31 @@ data Tracts_2020;
     Census.response_rates_2020_wv_tr20;
   by geo2020;
   
+  where put( county, $ctym20f. ) ~= '';
+
   keep state county geo2020 crrall crrint; 
 
 run;
+
+title2 'Tract-level response rates, 2020';
+title3 'Greater DC region';
+
+proc univariate data=Tracts_2020 plot nextrobs=20;
+  id geo2020;
+  var crrall;
+  format county $cnty20f.;
+run;
+
+title3 'By Jurisdiction';
+
+proc univariate data=Tracts_2020 plot nextrobs=10;
+  by county;
+  id geo2020;
+  var crrall;
+  format county $cnty20f.;
+run;
+
+title2;
 
 proc summary data=Tracts_2020;
   by county; 
@@ -89,7 +113,7 @@ options orientation=portrait;
 %fdate()
 
 ods listing close;
-ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Response_rate_tables.rtf" style=Styles.Rtf_arial_9pt;
+ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Response_rate_tables.rtf" style=Styles.Rtf_lato_9pt;
 
 footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
 footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
@@ -106,12 +130,12 @@ proc tabulate data=Tables_county format=comma10.1 noseps missing;
     /** Rows **/
     county=' ',
     /** Columns **/
+    sum='2010 \line Self-response rates (%)' * (
+      fsrr2010='Overall' 
+    )
     sum='2020 \line Self-response rates (%)' * (
       crrall='Overall' 
       crrint='Internet only' 
-    )
-    sum='2010 \line Self-response rates (%)' * (
-      fsrr2010='Overall' 
     )
     sum='2020 \line Tract\~self-response ranges (%)' * (
       crrall_max='Highest tract' 

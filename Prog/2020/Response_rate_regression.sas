@@ -131,7 +131,7 @@ options orientation=portrait;
 %fdate()
 
 ods listing close;
-ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Response_rate_regression.rtf" style=Styles.Rtf_arial_9pt bodytitle;
+ods rtf file="&_dcdata_default_path\NCDB\Prog\2020\Response_rate_regression.rtf" style=Styles.Rtf_lato_9pt bodytitle;
 
 footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
 

@@ -484,7 +484,7 @@ proc tabulate data=RaceBridgeSummary format=comma10.0 noseps missing;
     NHA2N='NH Asian & PI' 
     NHB2N='NH Black' 
     MRANHS2N='NH Multiracial'
-    NHO2N='NH Some other race' 
+    NHO2N='NH Some Other Race' 
     NHW2N='NH White' 
     ,
     /** Columns **/
@@ -672,7 +672,7 @@ ods pdf columns=3 startpage=never;
 %Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhi, racelabel=Non-Hisp. Am. Indian & AK Native, pagebreak=n )
 %Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nha, racelabel=Non-Hisp. Asian & PI, pagebreak=n )
 %Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhb, racelabel=Non-Hisp. Black, pagebreak=n )
-%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nho, racelabel=Non-Hisp. Some other race, pagebreak=n )
+%Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nho, racelabel=Non-Hisp. Some Other Race, pagebreak=n )
 %Scatter_plot( st=, geo=metro20, geolabel=MSA, race=nhw, racelabel=Non-Hisp. White, pagebreak=n )
 
 ods pdf close;
