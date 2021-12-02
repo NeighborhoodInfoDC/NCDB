@@ -114,7 +114,7 @@ data Ncdb_2020_blk;
 run;
 
 proc summary data=Ncdb_2020_blk nway;
-  class ucounty;
+  class state ucounty;
   var &var2020;
   output out=Ncdb_2020_sum (drop=_type_ _freq_) sum= ;
 run;
@@ -179,7 +179,7 @@ data RaceSummary;
   
   output;
   
-  keep year ucounty SHRD SHRNHBN SHRNHWN SHRHSPN SHRNHAN SHRNHIN SHRNHON MRANHSN;
+  keep year state ucounty SHRD SHRNHBN SHRNHWN SHRHSPN SHRNHAN SHRNHIN SHRNHON MRANHSN;
   
 run;
 
@@ -226,7 +226,7 @@ data AgeSummary;
   
   output;
   
-  keep year ucounty TRCTPOP ADULTN CHILDN;
+  keep year state ucounty TRCTPOP ADULTN CHILDN;
   
 run;
 
@@ -457,7 +457,7 @@ data RaceBridgeSummary;
   
   output;
   
-  keep type ucounty SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
+  keep state type ucounty SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
   
 run;
 
@@ -475,8 +475,23 @@ proc tabulate data=RaceBridgeSummary format=comma10.0 noseps missing;
   class type / preloadfmt order=data;
   var SHR2D NHW2N NHB2N NHA2N NHI2N NHO2N MRANHS2N SHRHSP2N;
   table 
+    /** Rows **/
+    SHR2d='Total'
+    SHRHSP2N='Hispanic/Latinx'
+    NHI2N='NH Am. Indian & AK Native' 
+    NHA2N='NH Asian & PI' 
+    NHB2N='NH Black' 
+    MRANHS2N='NH Multiracial'
+    NHO2N='NH Some Other Race' 
+    NHW2N='NH White' 
+    ,
+    /** Columns **/
+    ( sum='Population' pctsum<SHR2D>='% Population' * f=comma10.1 ) * type=' '
+    / condense
+  ;
+  table 
     /** Pages **/
-    all='Washington, DC MSA' ucounty=' ',
+    ucounty=' ',
     /** Rows **/
     SHR2d='Total'
     SHRHSP2N='Hispanic/Latinx'
@@ -492,6 +507,88 @@ proc tabulate data=RaceBridgeSummary format=comma10.0 noseps missing;
     / condense
   ;
   format type $type.;
+run;
+
+
+** Appendix D table with total and NH pop by race estimates **;
+
+** Format data **;
+
+data TotalNHRaceSummary;
+
+  set Table;
+  
+  array tot2a{*} 
+    SHRWHT2N SHRBLK2N SHRAMI2N SHRAPI2N SHROTH2N MRAPOP2N;
+
+  array nhl2a{*} 
+    SHRNHW2N SHRNHB2N SHRNHI2N SHRNHA2N SHRNHO2N MRANHS2N;
+
+  array all2a{*} 
+    ALLWHT2N ALLBLK2N ALLAMI2N ALLAPI2N ALLOTH2N ALLMRA2N;
+
+  type = 'TOT';
+    
+  do i = 1 to dim( all2a );
+    all2a{i} = tot2a{i};
+  end;
+
+  output;
+
+  type = 'NHL';
+    
+  do i = 1 to dim( all2a );
+    all2a{i} = nhl2a{i};
+  end;
+  
+  output;
+  
+  keep type state ucounty SHR2D ALL: ;
+  
+run;
+
+proc format;
+  value $typenhl (notsorted)
+    'NHL' = 'Non-Hispanic/Latinx'
+    'TOT' = 'Total'
+  ;
+run;
+
+title3 "Total and Non-Hispanic/Latinx by Race Estimates - 2020";
+
+proc tabulate data=TotalNHRaceSummary format=comma10.0 noseps missing;
+  class state /order=formatted;
+  class type / preloadfmt order=data;
+  var SHR2D ALL:;
+  table 
+    /** Rows **/
+    ALLAMI2N='Am. Indian & AK Native' 
+    ALLAPI2N='Asian & PI' 
+    ALLBLK2N='Black' 
+    ALLMRA2N='Multiracial'
+    ALLOTH2N='Some Other Race' 
+    ALLWHT2N='White' 
+    ,
+    /** Columns **/
+    ( sum='Population' pctsum<SHR2D>='% Population' * f=comma10.1 ) * type=' '
+    / condense
+  ;
+  table 
+    /** Pages **/
+    state=' ',
+    /** Rows **/
+    ALLAMI2N='Am. Indian & AK Native' 
+    ALLAPI2N='Asian & PI' 
+    ALLBLK2N='Black' 
+    ALLMRA2N='Multiracial'
+    ALLOTH2N='Some Other Race' 
+    ALLWHT2N='White' 
+    ,
+    /** Columns **/
+    ( sum='Population' pctsum<SHR2D>='% Population' * f=comma10.1 ) * type=' '
+    / condense
+  ;
+  format state $fstname. type $typenhl.;
 run;
 
 
