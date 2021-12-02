@@ -98,9 +98,9 @@ data Reg;
     child2 = 'Proportion children'
     shrnhw2 = 'Proportion NH White'
     shrnhb2 = 'Proportion NH Black'
-    shrnhi2='Proportion NH Am. Indian'
-    shrnha2='Proportion NH Asian/PI'
-    shrnho2='Proportion NH Other races'
+    shrnhi2='Proportion NH Am. Indian & AK Native'
+    shrnha2='Proportion NH Asian & PI'
+    shrnho2='Proportion NH Some other race'
     shrhsp2='Proportion Hispanic/Latinx'
   ;
   
