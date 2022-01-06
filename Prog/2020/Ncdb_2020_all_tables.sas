@@ -691,11 +691,21 @@ run;
   title1;
   footnote1;
   
-  options nodate nonumber;
+  options nodate nonumber nocenter nobyline;
   options orientation=portrait leftmargin=0.5in rightmargin=0.5in topmargin=0.5in bottommargin=0.5in;
-
-  ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" notoc nogfootnote;
   
+  proc template;
+   define style mystyle;
+   parent=styles.Pearl;
+      class graphwalls / 
+            frameborder=off;
+      class graphbackground / 
+            color=white;
+   end;
+  run;
+
+  ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" style=mystyle notoc nogfootnote;
+
   /**footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";**/
   
   ** Donut charts **;
@@ -746,7 +756,7 @@ run;
     by descending _type_ &geo;
   run;
   
-  ods graphics on / width=2.5in height=2in;
+  ods graphics on / width=2.5in height=2in border=off;
 
   ods pdf columns=3 startpage=never;
 
@@ -768,11 +778,12 @@ run;
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato");
     label &geo = "&geolabel" age="Age";
+    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE A.1";
     %if &st = dc %then %do;
-      title1 color=black font="Lato" "Pct. Adult vs. Child Population, %upcase(&st)";
+      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, #BYVAL1, %upcase(&st), 2000-2020";
     %end;
     %else %do;
-      title1 color=black font="Lato" "Pct. Adult vs. Child Population";
+      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, 2000-2020";
     %end;
   run;
   
@@ -780,14 +791,14 @@ run;
     ods pdf columns=3 startpage=never;
 
   ** Scatter plots **;
-  
+  /*
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=hsp, racelabel=Hispanic/Latinx )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=NH Am. Indian & AK Native )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=NH Asian & PI )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=NH Black )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=NH Some Other Race )
   %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=NH White )
-
+*/
   ods pdf close;
   ods listing;
 
@@ -951,6 +962,7 @@ run;
 /** End Macro Definition **/
 
 %Make_output( st=dc, geo=ward2012 )
+/*
 %Make_output( st=md, geo=ucounty )
 %Make_output( st=va, geo=ucounty )
 %Make_output( st=wv, geo=ucounty )
