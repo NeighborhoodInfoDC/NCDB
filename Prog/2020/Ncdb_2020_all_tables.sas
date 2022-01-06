@@ -77,7 +77,7 @@
 
 proc format;
   value $ward12x
-    ' ' = 'DC TOTAL'
+    ' ' = 'Total'
     '1' = 'Ward 1'
     '2' = 'Ward 2'
     '3' = 'Ward 3'
@@ -708,52 +708,61 @@ run;
 
   /**footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";**/
   
+  ** Put DC total last (because total not shown for population counts) **; 
+  /*
+  proc sort data=Table out=Donut;
+    by descending _type_ &geo;
+  run;
+  */
+  
+  proc sql noprint;
+    create table Donut as
+    select * from Table
+    order by _type_ desc, put( &geo, &geofmt );
+  quit;
+  
   ** Donut charts **;
   
   data Donut;
   
-    set Table;
+    set Donut;
     
-    length age $12;
+    fignum = _n_;
+    
+    length age $20;
       
     year = 2000;
     
-    age = 'Adults';
+    age = 'Adults 18+';
     pop = adult0n;
     output;
 
-    age = 'Children';
+    age = 'Children under 18';
     pop = child0n;
     output;
     
     year = 2010;
     
-    age = 'Adults';
+    age = 'Adults 18+';
     pop = adult1n;
     output;
 
-    age = 'Children';
+    age = 'Children under 18';
     pop = child1n;
     output;
     
     year = 2020;
     
-    age = 'Adults';
+    age = 'Adults 18+';
     pop = adult2n;
     output;
 
-    age = 'Children';
+    age = 'Children under 18';
     pop = child2n;
     output;
     
-    keep _type_ &geo year age pop;
+    keep _type_ fignum &geo year age pop;
     
-  run;
-  
-  ** Put DC total last (because total not shown for population counts) **; 
-  
-  proc sort data=Donut;
-    by descending _type_ &geo;
   run;
   
   ods graphics on / width=2.5in height=2in border=off;
@@ -772,15 +781,16 @@ run;
     %if &st ~= dc %then %do;
       where _type_ = 1;
     %end;
-    by &geo notsorted;
+    by fignum &geo notsorted;
     styleattrs datacolors=(&URBAN_COLOR_CYAN &URBAN_COLOR_GOLD);
     vbar year / group=age groupdisplay=stack freq=pop stat=percent;
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato");
+    keylegend / title="";
     label &geo = "&geolabel" age="Age";
-    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE A.1";
+    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE A.#BYVAL1";
     %if &st = dc %then %do;
-      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, #BYVAL1, %upcase(&st), 2000-2020";
+      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, #BYVAL2, %upcase(&st), 2000-2020";
     %end;
     %else %do;
       title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, 2000-2020";
