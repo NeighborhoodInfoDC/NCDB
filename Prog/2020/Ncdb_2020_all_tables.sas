@@ -8,8 +8,10 @@
  Environment:  Windows
  GitHub issue:  28
  
- Description:  Tables from 2000, 2010 and 2020 NCDB data for DC, MD, VA
- jurisdictions in Washington MSA (2020).
+ Description:  Tables and charts from 2000, 2010 and 2020 NCDB data for 
+ DC, MD, VA jurisdictions in Washington MSA (2020) used in the 
+ 2020 Census Overview for the Greater DC Region: Redistricting Data
+ report (January 2022).
 
  Modifications:
 **************************************************************************/
@@ -803,13 +805,12 @@ run;
   ** Scatter plots **;
 
   %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=hsp, racelabel=Hispanic/Latinx )
-/*
   %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nhi, racelabel=Non-Hispanic/Latinx American Indian & Alaska Native )
   %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nha, racelabel=Non-Hispanic/Latinx Asian & Pacific Islander )
   %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nhb, racelabel=Non-Hispanic/Latinx Black )
   %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nho, racelabel=Non-Hispanic/Latinx Some Other Race )
   %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nhw, racelabel=Non-Hispanic/Latinx White )
-/**/
+
   ods pdf close;
   ods listing;
 
@@ -845,23 +846,19 @@ run;
     
       year = 2000;
       shr&race.n = shr&race.0n;
-      shr&race. = shr&race.0n / shr0d;
       output;
       
       year = 2010;
       shr&race.n = shr&race.1n;
-      shr&race. = shr&race.1n / shr1d;
       output;
       
       year = 2020;
       shr&race.n = shr&race.2n;
-      shr&race. = shr&race.2n / shr2d;
       output;
       
-      format shr&race. percent6.1;
       format shr&race.n comma12.0;
       
-      keep _type_ fignum &geo year shr&race.n shr&race.;
+      keep _type_ fignum &geo year shr&race.n;
       
     %end;
     %else %do;
@@ -870,33 +867,23 @@ run;
       min&race.n = min&race.0n;
       shr&race.n = shr&race.0n;
       max&race.n = max&race.0n;
-      min&race. = min&race.0n / shr0d;
-      shr&race. = shr&race.0n / shr0d;
-      max&race. = max&race.0n / shr0d;
       output;
       
       year = 2010;
       min&race.n = min&race.1n;
       shr&race.n = shr&race.1n;
       max&race.n = max&race.1n;
-      min&race. = min&race.1n / shr1d;
-      shr&race. = shr&race.1n / shr1d;
-      max&race. = max&race.1n / shr1d;
       output;
       
       year = 2020;
       min&race.n = min&race.2n;
       shr&race.n = shr&race.2n;
       max&race.n = max&race.2n;
-      min&race. = min&race.2n / shr2d;
-      shr&race. = shr&race.2n / shr2d;
-      max&race. = max&race.2n / shr2d;
       output;
       
-      format min&race. shr&race. max&race. percent6.1;
       format min&race.n shr&race.n max&race.n comma12.0;
       
-      keep _type_ fignum &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
+      keep _type_ fignum &geo year min&race.n shr&race.n max&race.n;
       
     %end;
     
@@ -951,59 +938,45 @@ run;
     %if &race = hsp %then %do;
     
       year = 2000;
-      shr&race.n = shr&race.0n;
       shr&race. = shr&race.0n / shr0d;
       output;
       
       year = 2010;
-      shr&race.n = shr&race.1n;
       shr&race. = shr&race.1n / shr1d;
       output;
       
       year = 2020;
-      shr&race.n = shr&race.2n;
       shr&race. = shr&race.2n / shr2d;
       output;
       
       format shr&race. percent6.1;
-      format shr&race.n comma12.0;
       
-      keep _type_ fignum &geo year shr&race.n shr&race.;
+      keep _type_ fignum &geo year shr&race.;
       
     %end;
     %else %do;
 
       year = 2000;
-      min&race.n = min&race.0n;
-      shr&race.n = shr&race.0n;
-      max&race.n = max&race.0n;
       min&race. = min&race.0n / shr0d;
       shr&race. = shr&race.0n / shr0d;
       max&race. = max&race.0n / shr0d;
       output;
       
       year = 2010;
-      min&race.n = min&race.1n;
-      shr&race.n = shr&race.1n;
-      max&race.n = max&race.1n;
       min&race. = min&race.1n / shr1d;
       shr&race. = shr&race.1n / shr1d;
       max&race. = max&race.1n / shr1d;
       output;
       
       year = 2020;
-      min&race.n = min&race.2n;
-      shr&race.n = shr&race.2n;
-      max&race.n = max&race.2n;
       min&race. = min&race.2n / shr2d;
       shr&race. = shr&race.2n / shr2d;
       max&race. = max&race.2n / shr2d;
       output;
       
       format min&race. shr&race. max&race. percent6.1;
-      format min&race.n shr&race.n max&race.n comma12.0;
       
-      keep _type_ fignum &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
+      keep _type_ fignum &geo year min&race. shr&race. max&race.;
       
     %end;
     
@@ -1052,9 +1025,6 @@ run;
 /** End Macro Definition **/
 
 %Make_output( st=dc, geo=ward2012, appendix=A )
-
-%Make_output( st=va, geo=ucounty, appendix=C )
-/*
 %Make_output( st=md, geo=ucounty, appendix=B )
 %Make_output( st=va, geo=ucounty, appendix=C )
 %Make_output( st=wv, geo=ucounty, appendix=D )
