@@ -88,6 +88,8 @@ proc format;
     '8' = 'Ward 8';
 run;
 
+%global lastfignumber;
+
 
 /** Macro Make_output - Start Definition **/
 
@@ -186,7 +188,7 @@ run;
     
    format &geo &geofmt;
     
-  run;
+  run; 
 
 
   ***********************************************************************************************
@@ -688,6 +690,12 @@ run;
   
   ods rtf close;
   
+  
+  ***********************************************************************************************
+  **** Create charts;
+  
+  %let lastfignumber = 0;
+  
   title1;
   footnote1;
   
@@ -709,18 +717,22 @@ run;
   ** Sort data by formatted value. Put DC total last (because total not shown for population counts) **; 
   
   proc sql noprint;
-    create table Donut as
+    create table Table_sorted as
     select * from Table
     order by _type_ desc, put( &geo, &geofmt );
   quit;
   
-  ** Donut charts **;
+  ** Bar charts **;
   
-  data Donut;
+  data BarChart;
   
-    set Donut;
+    set Table_sorted;
     
-    fignum = _n_;
+    %if &st ~= dc %then %do;
+      where _type_ = 1;
+    %end;
+
+    fignum = _n_ + &lastfignumber;
     
     length age $40;
       
@@ -762,10 +774,7 @@ run;
 
   ods pdf columns=3 startpage=never;
 
-  proc sgplot data=Donut pctlevel=group;
-    %if &st ~= dc %then %do;
-      where _type_ = 1;
-    %end;
+  proc sgplot data=BarChart pctlevel=group;
     by fignum &geo notsorted;
     styleattrs datacolors=(&URBAN_COLOR_CYAN &URBAN_COLOR_GOLD);
     vbar year / group=age groupdisplay=stack freq=pop stat=percent nooutline seglabel seglabelattrs=(color=black family="Lato");
@@ -782,23 +791,34 @@ run;
     %end;
   run;
   
+  ** Update figure count **;
+  
+  proc sql noprint;
+    select max(fignum) into :lastfignumber from BarChart;
+  quit;
+  
     ods pdf columns=1 startpage=now;
     ods pdf columns=3 startpage=never;
 
   ** Scatter plots **;
-  /*
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=hsp, racelabel=Hispanic/Latinx )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhi, racelabel=NH Am. Indian & AK Native )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nha, racelabel=NH Asian & PI )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhb, racelabel=NH Black )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nho, racelabel=NH Some Other Race )
-  %Scatter_plot( st=&st, geo=&geo, geolabel=&geolabel, race=nhw, racelabel=NH White )
-*/
+
+  %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=hsp, racelabel=Hispanic/Latinx )
+/*
+  %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nhi, racelabel=Non-Hispanic/Latinx American Indian & Alaska Native )
+  %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nha, racelabel=Non-Hispanic/Latinx Asian & Pacific Islander )
+  %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nhb, racelabel=Non-Hispanic/Latinx Black )
+  %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nho, racelabel=Non-Hispanic/Latinx Some Other Race )
+  %Scatter_plot( appendix=&appendix, st=&st, geo=&geo, geolabel=&geolabel, geofmt=&geofmt, race=nhw, racelabel=Non-Hispanic/Latinx White )
+/**/
   ods pdf close;
   ods listing;
 
   footnote1;
   title1 "&_library/&_program: Urban-Greater DC";
+
+  proc datasets library=Work nolist;
+    delete Table Table_sorted /memtype=data;
+  quit;
 
 %mend Make_output;
 
@@ -807,20 +827,20 @@ run;
 
 /** Macro Scatter_plot - Start Definition **/
 
-%macro Scatter_plot( st=, geo=, geolabel=, race=, racelabel= );
+%macro Scatter_plot( appendix=, st=, geo=, geolabel=, geofmt=, race=, racelabel= );
 
   %let race = %lowcase( &race );
 
-  *** Graphics ***;
+  ** Population counts **;
 
-  data Scatter;
+  data Scatter_count;
 
-    set Table;
-
-    %if &st ~= dc %then %do;
-      where _type_ = 1;
-    %end;
+    set Table_sorted;
     
+    where _type_ = 1;
+
+    fignum = _n_ + &lastfignumber;
+
     %if &race = hsp %then %do;
     
       year = 2000;
@@ -841,7 +861,7 @@ run;
       format shr&race. percent6.1;
       format shr&race.n comma12.0;
       
-      keep _type_ &geo year shr&race.n shr&race.;
+      keep _type_ fignum &geo year shr&race.n shr&race.;
       
     %end;
     %else %do;
@@ -876,44 +896,40 @@ run;
       format min&race. shr&race. max&race. percent6.1;
       format min&race.n shr&race.n max&race.n comma12.0;
       
-      keep _type_ &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
+      keep _type_ fignum &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
       
     %end;
     
   run;
   
-  ** Put DC total last (because total not shown for population counts) **; 
-  
-  proc sort data=Scatter;
-    by descending _type_ &geo;
-  run;
-  
-  
-  ** Charts **;
-  
-  ** Population counts **;
-
-  proc sgplot data=Scatter noautolegend uniform=scale;
-    where _type_ = 1;
-    by &geo notsorted;
+  proc sgplot data=Scatter_count noautolegend uniform=scale;
+    by fignum &geo notsorted;
     scatter x=year y=shr&race.n / 
       %if &race ~= hsp %then %do;
         yerrorlower=min&race.n
         yerrorupper=max&race.n
         errorbarattrs=(color=black thickness=1)
       %end;
-      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled);
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled) 
+      /*datalabel datalabelattrs=(color=black family="Lato")*/;
     series x=year y=shr&race.n / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0;
     label &geo = "&geolabel";
+    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";
     %if &st = dc %then %do;
-      title1 color=black font="Lato" "&racelabel Population, %upcase(&st)";
+      title2 justify=left color=black font="Lato" height=10pt "&racelabel Population, #BYVAL2, %upcase(&st), 2000–20";
     %end;
     %else %do;
-      title1 color=black font="Lato" "&racelabel Population";
+      title2 justify=left color=black font="Lato" height=10pt "&racelabel Population, #BYVAL2, 2000–20";
     %end;
   run;
+  
+  ** Update figure count **;
+  
+  proc sql noprint;
+    select max(fignum) into :lastfignumber from Scatter_count;
+  quit;
   
   %if &st ~= wv %then %do;
     ods pdf columns=1 startpage=now;
@@ -922,26 +938,105 @@ run;
 
   ** Percentage of population **;
   
-  proc sgplot data=Scatter noautolegend uniform=scale;
-    by &geo notsorted;
+  data Scatter_pct;
+
+    set Table_sorted;
+    
+    %if &st ~= dc %then %do;
+      where _type_ = 1;
+    %end;
+    
+    fignum = _n_ + &lastfignumber;
+
+    %if &race = hsp %then %do;
+    
+      year = 2000;
+      shr&race.n = shr&race.0n;
+      shr&race. = shr&race.0n / shr0d;
+      output;
+      
+      year = 2010;
+      shr&race.n = shr&race.1n;
+      shr&race. = shr&race.1n / shr1d;
+      output;
+      
+      year = 2020;
+      shr&race.n = shr&race.2n;
+      shr&race. = shr&race.2n / shr2d;
+      output;
+      
+      format shr&race. percent6.1;
+      format shr&race.n comma12.0;
+      
+      keep _type_ fignum &geo year shr&race.n shr&race.;
+      
+    %end;
+    %else %do;
+
+      year = 2000;
+      min&race.n = min&race.0n;
+      shr&race.n = shr&race.0n;
+      max&race.n = max&race.0n;
+      min&race. = min&race.0n / shr0d;
+      shr&race. = shr&race.0n / shr0d;
+      max&race. = max&race.0n / shr0d;
+      output;
+      
+      year = 2010;
+      min&race.n = min&race.1n;
+      shr&race.n = shr&race.1n;
+      max&race.n = max&race.1n;
+      min&race. = min&race.1n / shr1d;
+      shr&race. = shr&race.1n / shr1d;
+      max&race. = max&race.1n / shr1d;
+      output;
+      
+      year = 2020;
+      min&race.n = min&race.2n;
+      shr&race.n = shr&race.2n;
+      max&race.n = max&race.2n;
+      min&race. = min&race.2n / shr2d;
+      shr&race. = shr&race.2n / shr2d;
+      max&race. = max&race.2n / shr2d;
+      output;
+      
+      format min&race. shr&race. max&race. percent6.1;
+      format min&race.n shr&race.n max&race.n comma12.0;
+      
+      keep _type_ fignum &geo year min&race.n shr&race.n max&race.n min&race. shr&race. max&race.;
+      
+    %end;
+    
+  run;
+  
+  proc sgplot data=Scatter_pct noautolegend uniform=scale;
+    by fignum &geo notsorted;
     scatter x=year y=shr&race. / 
       %if &race ~= hsp %then %do;
         yerrorlower=min&race.
         yerrorupper=max&race.
         errorbarattrs=(color=black thickness=1)
       %end;
-      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled);
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled) 
+      /*datalabel datalabelattrs=(color=black family="Lato")*/;
     series x=year y=shr&race. / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=(nolabel) valueattrs=(color=black family="Lato") min=0;
     label &geo = "&geolabel";
+    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";
     %if &st = dc %then %do;
-      title1 color=black font="Lato" "Pct. &racelabel Population, %upcase(&st)";
+      title2 justify=left color=black font="Lato" height=10pt "Percentage &racelabel Population, #BYVAL2, %upcase(&st), 2000–20";
     %end;
     %else %do;
-      title1 color=black font="Lato" "Pct. &racelabel Population";
+      title2 justify=left color=black font="Lato" height=10pt "Percentage &racelabel Population, #BYVAL2, 2000–20";
     %end;
   run;
+  
+  ** Update figure count **;
+  
+  proc sql noprint;
+    select max(fignum) into :lastfignumber from Scatter_pct;
+  quit;
   
   %if &st ~= wv %then %do;
     ods pdf columns=1 startpage=now;
@@ -949,7 +1044,7 @@ run;
   %end;
 
   proc datasets library=work nolist;
-    delete Scatter /memtype=data;
+    delete Scatter Scatter_count Scatter_pct /memtype=data;
   quit;
   
 %mend Scatter_plot;
@@ -957,7 +1052,7 @@ run;
 /** End Macro Definition **/
 
 %Make_output( st=dc, geo=ward2012, appendix=A )
-/*
+
 %Make_output( st=va, geo=ucounty, appendix=C )
 /*
 %Make_output( st=md, geo=ucounty, appendix=B )
