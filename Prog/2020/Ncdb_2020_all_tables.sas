@@ -91,7 +91,7 @@ run;
 
 /** Macro Make_output - Start Definition **/
 
-%macro Make_output( st=, geo= );
+%macro Make_output( st=, geo=, appendix= );
 
   %local geolabel;
 
@@ -706,14 +706,7 @@ run;
 
   ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Ncdb_2020_&st._charts.pdf" style=mystyle notoc nogfootnote;
 
-  /**footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";**/
-  
-  ** Put DC total last (because total not shown for population counts) **; 
-  /*
-  proc sort data=Table out=Donut;
-    by descending _type_ &geo;
-  run;
-  */
+  ** Sort data by formatted value. Put DC total last (because total not shown for population counts) **; 
   
   proc sql noprint;
     create table Donut as
@@ -729,35 +722,35 @@ run;
     
     fignum = _n_;
     
-    length age $20;
+    length age $40;
       
     year = 2000;
     
-    age = 'Adults 18+';
+    age = 'Adults 18 and older';
     pop = adult0n;
     output;
 
-    age = 'Children under 18';
+    age = 'Children younger than 18';
     pop = child0n;
     output;
     
     year = 2010;
     
-    age = 'Adults 18+';
+    age = 'Adults 18 and older';
     pop = adult1n;
     output;
 
-    age = 'Children under 18';
+    age = 'Children younger than 18';
     pop = child1n;
     output;
     
     year = 2020;
     
-    age = 'Adults 18+';
+    age = 'Adults 18 and older';
     pop = adult2n;
     output;
 
-    age = 'Children under 18';
+    age = 'Children younger than 18';
     pop = child2n;
     output;
     
@@ -769,31 +762,23 @@ run;
 
   ods pdf columns=3 startpage=never;
 
-  /*** NOT SUPPORTED IN CURRENT URBAN SAS VERSION ***
-  proc sgpie data=Donut;
-    by year &geo notsorted;
-    donut age / response=pop;
-    title1 "Pct. ;
-  run;
-  */
-
   proc sgplot data=Donut pctlevel=group;
     %if &st ~= dc %then %do;
       where _type_ = 1;
     %end;
     by fignum &geo notsorted;
     styleattrs datacolors=(&URBAN_COLOR_CYAN &URBAN_COLOR_GOLD);
-    vbar year / group=age groupdisplay=stack freq=pop stat=percent;
+    vbar year / group=age groupdisplay=stack freq=pop stat=percent nooutline seglabel seglabelattrs=(color=black family="Lato");
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
-    yaxis display=(nolabel) valueattrs=(color=black family="Lato");
-    keylegend / title="";
+    yaxis display=none /*display=(nolabel) valueattrs=(color=black family="Lato")*/;
+    keylegend / noborder position=topleft location=outside title="";
     label &geo = "&geolabel" age="Age";
-    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE A.#BYVAL1";
+    title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";
     %if &st = dc %then %do;
-      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, #BYVAL2, %upcase(&st), 2000-2020";
+      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, #BYVAL2, %upcase(&st), 2000–20";
     %end;
     %else %do;
-      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, 2000-2020";
+      title2 justify=left color=black font="Lato" height=10pt "Adult and Child Populations, #BYVAL2, 2000–20";
     %end;
   run;
   
@@ -971,8 +956,10 @@ run;
 
 /** End Macro Definition **/
 
-%Make_output( st=dc, geo=ward2012 )
+%Make_output( st=dc, geo=ward2012, appendix=A )
 /*
-%Make_output( st=md, geo=ucounty )
-%Make_output( st=va, geo=ucounty )
-%Make_output( st=wv, geo=ucounty )
+%Make_output( st=va, geo=ucounty, appendix=C )
+/*
+%Make_output( st=md, geo=ucounty, appendix=B )
+%Make_output( st=va, geo=ucounty, appendix=C )
+%Make_output( st=wv, geo=ucounty, appendix=D )
