@@ -782,7 +782,7 @@ run;
     vbar year / group=age groupdisplay=stack freq=pop stat=percent nooutline seglabel seglabelattrs=(color=black family="Lato");
     xaxis display=(nolabel) valueattrs=(color=black family="Lato");
     yaxis display=none /*display=(nolabel) valueattrs=(color=black family="Lato")*/;
-    keylegend / noborder position=topleft location=outside title="";
+    keylegend / noborder autooutline position=topleft location=outside title="";
     label &geo = "&geolabel" age="Age";
     title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";
     %if &st = dc %then %do;
