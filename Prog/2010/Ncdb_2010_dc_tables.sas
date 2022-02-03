@@ -1,18 +1,20 @@
 /**************************************************************************
  Program:  Ncdb_2010_dc_tables.sas
  Library:  Ncdb
- Project:  NeighborhoodInfo DC
+ Project:  Urban-Greater DC
  Author:   P. Tatian
  Created:  03/15/11
- Version:  SAS 9.1
+ Version:  SAS 9.4
  Environment:  Windows
+ GitHub issue:  28
  
- Description:  Tables from 2010 and 2000 NCDB data.
+ Description:  Tables from 2000 and 2010 NCDB data.
 
  Modifications:
+  9/3/21 Updated code to run under new set up. 
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
+%include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( Ncdb )
@@ -48,8 +50,15 @@
 
 ** 2000 data **;
 
+data Ncdb_lf_2000_dc;
+
+  set Ncdb.Ncdb_lf_2000_was15 (where=(statecd='11'));
+  
+run;
+
 %Transform_geo_data(
-    dat_ds_name=Ncdb.Ncdb_lf_2000_dc,
+    /***dat_ds_name=Ncdb.Ncdb_lf_2000_dc,***/
+    dat_ds_name=Ncdb_lf_2000_dc,
     dat_org_geo=geo2000,
     dat_count_vars=&var2000,
     dat_prop_vars=,
@@ -93,7 +102,10 @@ options nodate nonumber;
 
 %fdate()
 
-ods rtf file="D:\DCData\Libraries\NCDB\Prog\Ncdb_2010_dc_tables.rtf" style=Styles.Rtf_arial_9pt;
+ods rtf file="&_dcdata_default_path\NCDB\Prog\2010\Ncdb_2010_dc_tables.rtf" style=Styles.Rtf_arial_9pt;
+
+footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 
 **** Population & housing unit counts ****;
 
@@ -123,8 +135,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   ;
   title2 ' ';
   title3 'Population and Housing Unit Counts - 2000 vs. 2010';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 ********  COUNTS  ********;
@@ -158,8 +168,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title2 ' ';
   title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
   title4 'Population by Race';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** SHR: Population by Race/Ethnicity ****;
@@ -193,8 +201,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title2 ' ';
   title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
   title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MIN: Population by race ****;
@@ -228,8 +234,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title2 ' ';
   title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
   title4 'Population by Race';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MIN: Population by Race/Ethnicity ****;
@@ -265,8 +269,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title2 ' ';
   title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
   title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MAX: Population by race ****;
@@ -299,8 +301,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
   title4 'Population by Race';
   title5 'NOTE: Subgroups will not add to total population.';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MAX: Population by Race/Ethnicity ****;
@@ -335,8 +335,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
   title4 'Population by Race/Ethnicity (NH = Non-Hispanic)';
   title5 'NOTE: Subgroups will not add to total population.';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** Child vs. Adult population ****;
@@ -363,8 +361,6 @@ proc tabulate data=Table format=comma10.0 noseps missing;
   title2 ' ';
   title3 'Child and Adult Population - 2000 vs. 2010';
   title4 'Persons';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 
@@ -399,8 +395,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title2 ' ';
   title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
   title4 'Percent Population by Race';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** SHR: Population by Race/Ethnicity ****;
@@ -434,8 +428,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title2 ' ';
   title3 'NCDB Race Bridging Variables (SHR) - 2000 vs. 2010';
   title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MIN: Population by race ****;
@@ -469,8 +461,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title2 ' ';
   title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
   title4 'Percent Population by Race';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MIN: Population by Race/Ethnicity ****;
@@ -506,8 +496,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title2 ' ';
   title3 'NCDB Race Alone Variables (MIN) + Multiracial - 2000 vs. 2010';
   title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MAX: Population by race ****;
@@ -540,8 +528,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
   title4 'Percent Population by Race';
   title5 'NOTE: Percentages will not add to 100.';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** MAX: Population by Race/Ethnicity ****;
@@ -576,8 +562,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title3 'NCDB Race Alone or in Combination Variables (MAX) - 2000 vs. 2010';
   title4 'Percent Population by Race/Ethnicity (NH = Non-Hispanic)';
   title5 'NOTE: Percentages will not add to 100.';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 **** Child vs. Adult population ****;
@@ -604,8 +588,6 @@ proc tabulate data=Table format=comma8.1 noseps missing;
   title2 ' ';
   title3 'Child and Adult Population - 2000 vs. 2010';
   title4 'Percent Persons';
-  footnote1 height=9pt "Prepared by NeighborhoodInfo DC (www.NeighborhoodInfoDC.org), &fdate..";
-  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 run;
 
 ods rtf close;
