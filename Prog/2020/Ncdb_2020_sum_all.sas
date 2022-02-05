@@ -31,7 +31,7 @@
 %global revisions year y sum_vars;
 
 /** Update with information on latest file revision **/
-%let revisions = %str(Added Stanton Commons geography);
+%let revisions = %str(New file.);
 
 %let year = 2020;
 %let y    = 2;
