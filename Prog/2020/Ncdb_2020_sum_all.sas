@@ -65,17 +65,29 @@ data Ncdb_&year.;
     SHRNHI&y.N=PopNativeAmNonHispBridge_&year
     MINNHO&y.N=PopOtherNonHispAlone_&year
     SHRNHO&y.N=PopOtherNonHispBridge_&year
+    ADULT&y.N=Pop18YearsandOver_&year
     CHILD&y.N=PopUnder18Years_&year
     /** OLD&y.N=Pop65andOverYears_&year **/
     TOTHSUN&y.=NumHsgUnits_&year
     OCCHU&y.=NumOccupiedHsgUnits_&year
-    VACHU&y.=NumVacantHsgUnits_&year;
+    VACHU&y.=NumVacantHsgUnits_&year
+    P0050001=PopGQTotal_&year
+    P0050002=PopGQInstitutional_&year
+    P0050003=PopGQCorrectional_&year
+    P0050004=PopGQJuvenile_&year
+    P0050005=PopGQNursing_&year
+    P0050006=PopGQOthrInstitut_&year
+    P0050007=PopGQNoninstitut_&year
+    P0050008=PopGQCollege_&year
+    P0050009=PopGQMilitary_&year
+    P0050010=PopGQOthrNoninst_&year
+    ;
 
   keep 
     _char_ TRCTPOP&y. shr&y.d SHRHSP&y.N SHRNHA&y.N SHRNHB&y.N SHRNHI&y.N SHRNHO&y.N SHRNHW&y.N
     MINNHA&y.N MINNHB&y.N MINNHI&y.N MINNHO&y.N MINNHW&y.N MRANHS&y.N 
     PopOtherRaceNonHispBridge_&year PopMinorityAlone_&year PopMinorityBridge_&year
-    CHILD&y.N /**OLD&y.N**/ TOTHSUN&y. OCCHU&y. VACHU&y. ;
+    ADULT&y.N CHILD&y.N /**OLD&y.N**/ TOTHSUN&y. OCCHU&y. VACHU&y. P005: ;
 
 run;
 
@@ -103,7 +115,17 @@ proc datasets library=Work memtype=(data);
     PopMinorityBridge_&year = "Minority pop, those who are not non-Hisp white (1990 race def), &year"
     NumHsgUnits_&year = "Total housing units, &year"
     NumOccupiedHsgUnits_&year = "Occupied housing units, &year"
-    NumVacantHsgUnits_&year = "Vacant housing units, &year";
+    NumVacantHsgUnits_&year = "Vacant housing units, &year"
+    PopGQCollege_&year         = "College/university student housing group quarters population, &year"
+    PopGQCorrectional_&year    = "Correctional facilities for adults group quarters population, &year"
+    PopGQInstitutional_&year   = "Institutionalized group quarters population, &year"
+    PopGQJuvenile_&year        = "Juvenile facilities group quarters population, &year"
+    PopGQMilitary_&year        = "Military quarters group quarters population, &year"
+    PopGQNoninstitut_&year     = "Noninstitutionalized group quarters population, &year"
+    PopGQNursing_&year         = "Nursing facilities/skilled-nursing facilities group quarters population, &year"
+    PopGQOthrInstitut_&year    = "Other institutional facilities group quarters population, &year"
+    PopGQOthrNoninst_&year     = "Other noninstitutional facilities group quarters population, &year"
+    PopGQTotal_&year           = "Total group quarters population, &year";
 quit;
 
 
