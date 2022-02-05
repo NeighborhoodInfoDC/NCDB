@@ -66,7 +66,7 @@ data Ncdb_&year.;
     MINNHO&y.N=PopOtherNonHispAlone_&year
     SHRNHO&y.N=PopOtherNonHispBridge_&year
     CHILD&y.N=PopUnder18Years_&year
-    OLD&y.N=Pop65andOverYears_&year
+    /** OLD&y.N=Pop65andOverYears_&year **/
     TOTHSUN&y.=NumHsgUnits_&year
     OCCHU&y.=NumOccupiedHsgUnits_&year
     VACHU&y.=NumVacantHsgUnits_&year;
@@ -75,7 +75,7 @@ data Ncdb_&year.;
     _char_ TRCTPOP&y. shr&y.d SHRHSP&y.N SHRNHA&y.N SHRNHB&y.N SHRNHI&y.N SHRNHO&y.N SHRNHW&y.N
     MINNHA&y.N MINNHB&y.N MINNHI&y.N MINNHO&y.N MINNHW&y.N MRANHS&y.N 
     PopOtherRaceNonHispBridge_&year PopMinorityAlone_&year PopMinorityBridge_&year
-    CHILD&y.N OLD&y.N TOTHSUN&y. OCCHU&y. VACHU&y. ;
+    CHILD&y.N /**OLD&y.N**/ TOTHSUN&y. OCCHU&y. VACHU&y. ;
 
 run;
 
@@ -85,7 +85,7 @@ proc datasets library=Work memtype=(data);
     TotPop_&year = "Total population, &year"
     PopWithRace_&year = "Total population for race/ethnicity, &year"
     PopUnder18Years_&year = "Persons under 18 years old, &year"
-    Pop65andOverYears_&year = "Persons 65 years old and over, &year"
+    /**Pop65andOverYears_&year = "Persons 65 years old and over, &year"**/
     PopBlackNonHispAlone_&year = "Non-Hispanic Black/African American alone population, &year"
     PopWhiteNonHispAlone_&year = "Non-Hispanic White alone population, &year"
     PopAsianPINonHispAlone_&year = "Non-Hispanic Asian, Hawaiian and Pacific Islander alone pop., &year"
@@ -161,23 +161,22 @@ quit;
 /** End Macro Definition **/
 
 %Ncdb_sum_geo( geo=voterpre2012 )
-/*
 %Ncdb_sum_geo( geo=eor )
 %Ncdb_sum_geo( geo=anc2002 )
 %Ncdb_sum_geo( geo=anc2012 )
+%Ncdb_sum_geo( geo=bridgepk )
 %Ncdb_sum_geo( geo=city )
 %Ncdb_sum_geo( geo=cluster_tr2000 )
+%Ncdb_sum_geo( geo=cluster2017 )
 %Ncdb_sum_geo( geo=psa2004 )
 %Ncdb_sum_geo( geo=psa2012 )
-%Ncdb_sum_geo( geo=geo2000 )
-%Ncdb_sum_geo( geo=geo2010 )
-%Ncdb_sum_geo( geo=geo2020 )
+%Ncdb_sum_geo( geo=stantoncommons )
 %Ncdb_sum_geo( geo=ward2002 )
 %Ncdb_sum_geo( geo=ward2012 )
 %Ncdb_sum_geo( geo=zip )
-%Ncdb_sum_geo( geo=bridgepk )
-%Ncdb_sum_geo( geo=cluster2017 )
-%Ncdb_sum_geo( geo=stantoncommons )
+%Ncdb_sum_geo( geo=geo2000 )
+%Ncdb_sum_geo( geo=geo2010 )
+%Ncdb_sum_geo( geo=geo2020 )
 
 run;
 
