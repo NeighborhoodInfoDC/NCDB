@@ -23,7 +23,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Fix variable names.;
+%let revisions = Add DC geo variables.;
 
 %Ncdb_2020_blk_mac( dc )
 
