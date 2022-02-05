@@ -47,7 +47,7 @@
     
     %if &state = dc %then %do;
     
-      /****** TEMPORARY CODE ******/
+      /****** TEMPORARY CODE REMOVED 2/5/22 ******
       
       length Ward2012 $ 1;
   
@@ -60,11 +60,6 @@
       %let freqvars = &freqvars Ward2012;
       
       /****************************/
-
-      
-      
-    %MACRO SKIP;
-    
 
       ** Check DC blocks **;
       
@@ -113,12 +108,14 @@
         %Block20_to_stantoncommons( )
         
       end;
+      else do;
       
-      %let freqvars = &freqvars voterpre2012 anc2002 anc2012 city cluster2000 cluster_tr2000  
-                      psa2004 psa2012 geo2000 geo2020 ward2002 ward2012 eor zip bridgepk cluster2017 stantoncommons;
+        %warn_put( msg="Missing or invalid block ID" _n_= GeoBlk2020= )
+        
+      end;
       
-    %MEND SKIP;
-
+      %let freqvars = &freqvars voterpre2012 anc2012 city cluster2017 psa2012 geo2020 ward2012 eor zip;
+      
     %end;
     
     
@@ -488,11 +485,19 @@
   run;
   
   %MEND SKIP;
+  
+  
+  ** TEMPORARY CODE BECAUSE NO AGE_VARS DATA YET **;
+  
+  DATA NCDB_2020_&state._blk;
+  
+    SET CEN_VARS;
+    
+  RUN;
 
 
   %Finalize_data_set(
-    /**** TEMPORARY CHANGE  data=NCDB_2020_&state._blk, ****/
-    data=cen_vars,
+    data=NCDB_2020_&state._blk,
     out=NCDB_2020_&state._blk,
     outlib=NCDB,
     label="NCDB, 2020, %upcase(&state), block",
@@ -500,7 +505,8 @@
     /** Metadata parameters **/
     revisions=%str(&revisions),
     /** File info parameters **/
-    printobs=5,
+    printobs=10,
+    printvars=_character_,
     freqvars=&freqvars
   )
 
