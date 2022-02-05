@@ -1,13 +1,13 @@
 /**************************************************************************
- Program:  Ncdb_2010_sum_all.sas
+ Program:  Ncdb_2020_sum_all.sas
  Library:  NCDB
  Project:  NeighborhoodInfo DC
  Author:   P. Tatian
- Created:  03/23/11
- Version:  SAS 9.1
+ Created:  02/05/22
+ Version:  SAS 9.4
  Environment:  Windows with SAS/Connect
  
- Description:  Create all NCDB 2010 DC geo summary level files, with
+ Description:  Create all NCDB 2020 DC geo summary level files, with
  DataPlace variable names, from block data.
 
  Modifications:
@@ -23,25 +23,27 @@
   05/22/18 RP Added stanton commons geography.
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( NCDB )
 
+%global revisions year y sum_vars;
+
 /** Update with information on latest file revision **/
 %let revisions = %str(Added Stanton Commons geography);
 
-%let year = 2010;
-%let y    = 1;
+%let year = 2020;
+%let y    = 2;
 
 %let sum_vars = TotPop: Pop: Num: ;
 
 
 ** Create DataPlace-compatible variable names **;
 
-data Ncdb_2010;
+data Ncdb_&year.;
 
-  set Ncdb.NCDB_2010_dc_blk;
+  set Ncdb.NCDB_&year._dc_blk;
   
   PopMinorityAlone_&year = sum(shr&y.d,-minnhw&y.n);
   PopMinorityBridge_&year = sum(shr&y.d,-shrnhw&y.n);
@@ -78,7 +80,7 @@ data Ncdb_2010;
 run;
 
 proc datasets library=Work memtype=(data);
-  modify Ncdb_2010;
+  modify Ncdb_&year.;
   label
     TotPop_&year = "Total population, &year"
     PopWithRace_&year = "Total population for race/ethnicity, &year"
@@ -127,12 +129,12 @@ quit;
   
   ** Convert data to single obs. per geographic unit & year **;
 
-  proc summary data=Ncdb_2010 nway completetypes;
+  proc summary data=Ncdb_&year. nway completetypes;
     class &geo / preloadfmt;
     var &sum_vars;
     output 
-      out=Ncdb_sum_2010&geosuf 
-            (label="NCDB summary, 2010, DC, &geodlbl" 
+      out=Ncdb_sum_&year.&geosuf 
+            (label="NCDB summary, &year., DC, &geodlbl" 
              sortedby=&geo
              drop=_type_ _freq_) 
       sum=;
@@ -140,10 +142,10 @@ quit;
   run;
   
   %Finalize_data_set(
-    data=Ncdb_sum_2010&geosuf,
-    out=Ncdb_sum_2010&geosuf,
+    data=Ncdb_sum_&year.&geosuf,
+    out=Ncdb_sum_&year.&geosuf,
     outlib=NCDB,
-    label="NCDB summary, 2010, DC, &geodlbl",
+    label="NCDB summary, &year., DC, &geodlbl",
     sortby=&geo,
     /** Metadata parameters **/
     revisions=%str(&revisions),
@@ -159,6 +161,7 @@ quit;
 /** End Macro Definition **/
 
 %Ncdb_sum_geo( geo=voterpre2012 )
+/*
 %Ncdb_sum_geo( geo=eor )
 %Ncdb_sum_geo( geo=anc2002 )
 %Ncdb_sum_geo( geo=anc2012 )
@@ -168,6 +171,7 @@ quit;
 %Ncdb_sum_geo( geo=psa2012 )
 %Ncdb_sum_geo( geo=geo2000 )
 %Ncdb_sum_geo( geo=geo2010 )
+%Ncdb_sum_geo( geo=geo2020 )
 %Ncdb_sum_geo( geo=ward2002 )
 %Ncdb_sum_geo( geo=ward2012 )
 %Ncdb_sum_geo( geo=zip )
