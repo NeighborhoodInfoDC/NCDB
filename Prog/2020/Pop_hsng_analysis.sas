@@ -30,6 +30,54 @@
 %let URBAN_COLOR_MAGENTA = "cxec008b";
 %let URBAN_COLOR_GREEN = "cx558748";
 
+/** Macro hbar - Start Definition **/
+
+%macro hbar( var=, title= );
+
+  proc sort data=A;
+    by descending &var;
+  run;
+
+  proc sgplot data=A noautolegend;
+    hbarparm category=cluster2017 response=&var / nooutline fillattrs=(color=&URBAN_COLOR_CYAN) datalabel;
+    yaxis display=(nolabel) valueattrs=(color=black family="Lato" size=8pt);
+    xaxis display=none /*display=(nolabel) valueattrs=(color=black family="Lato" size=9pt)*/;
+    title2 justify=left color=black font="Lato" height=10pt "&title, 2010–2020";
+  run;
+
+%mend hbar;
+
+/** End Macro Definition **/
+
+
+/** Macro scatter - Start Definition **/
+
+%macro scatter( x=, y=, xlabel=, ylabel=, datalabel=, where= );
+
+  proc sgplot data=A noautolegend uniform=scale;
+    %if %length( &where ) > 0 %then %do;
+      where &where;
+    %end;
+    scatter x=&x y=&y / 
+      markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled)
+      tip=(&datalabel)
+      /*tip=(numhsgunits_chg popblacknonhispbridge_chg cluster2017) tipformat=(comma8.0 comma8.0 $clus17a.)*/
+      datalabel=&datalabel datalabelattrs=(color=black family="Lato");
+    reg x=&x y=&y / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
+    xaxis /*display=(nolabel)*/ valueattrs=(color=black family="Lato");
+    yaxis /*display=(nolabel)*/ valueattrs=(color=black family="Lato");
+    label 
+      &x = "&xlabel" 
+      &y = "&ylabel";
+    /*title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";*/
+    title2 justify=left color=black font="Lato" height=10pt "&ylabel vs. &xlabel, 2010–2020";
+  run;
+
+%mend scatter;
+
+/** End Macro Definition **/
+
+
 data A;
 
   merge 
@@ -80,31 +128,10 @@ proc template;
  end;
 run;
 
-ods graphics on / imagemap /*width=6in height=4in*/ border=off;
 
-***ods pdf file="&_dcdata_default_path\NCDB\Prog\2020\Pop_hsng_analysis.pdf" style=mystyle notoc nogfootnote;
-ods html file="&_dcdata_default_path\NCDB\Prog\2020\Pop_hsng_analysis.html";
+ods html file="&_dcdata_default_path\NCDB\Prog\2020\Pop_hsng_analysis_cluster2017.html" (title="Analysis by cluster2017");
 
-ods graphics on / height=10in width=8in;
-
-/** Macro hbar - Start Definition **/
-
-%macro hbar( var=, title= );
-
-  proc sort data=A;
-    by descending &var;
-  run;
-
-  proc sgplot data=A noautolegend;
-    hbarparm category=cluster2017 response=&var / nooutline fillattrs=(color=&URBAN_COLOR_CYAN) datalabel;
-    yaxis display=(nolabel) valueattrs=(color=black family="Lato" size=8pt);
-    xaxis display=none /*display=(nolabel) valueattrs=(color=black family="Lato" size=9pt)*/;
-    title2 justify=left color=black font="Lato" height=10pt "&title, 2010–20";
-  run;
-
-%mend hbar;
-
-/** End Macro Definition **/
+ods graphics on / imagemap=on border=off height=10in width=8in;
 
 %hbar( var=totpop_chg, title=Change in total population )
 %hbar( var=totpop_pctchg, title=Pct. change in total population )
@@ -115,39 +142,43 @@ ods graphics on / height=10in width=8in;
 %hbar( var=numhsgunits_chg, title=Change in housing units )
 %hbar( var=numhsgunits_pctchg, title=Pct. change in housing units )
 
+ods graphics on / imagemap=on height=7in width=11in;
 
-proc sgplot data=A noautolegend uniform=scale;
-  where cluster2017 not in ( "27" );
-  scatter x=numhsgunits_chg y=popblacknonhispbridge_chg / 
-    markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled)
-    /*tip=(numhsgunits_chg popblacknonhispbridge_chg cluster2017) tipformat=(comma8.0 comma8.0 $clus17a.)*/
-    /*datalabel datalabelattrs=(color=black family="Lato")*/;
-  reg x=numhsgunits_chg y=popblacknonhispbridge_chg / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
-  xaxis /*display=(nolabel)*/ valueattrs=(color=black family="Lato");
-  yaxis /*display=(nolabel)*/ valueattrs=(color=black family="Lato");
-  format numhsgunits_chg popblacknonhispbridge_chg comma8.0;
-  label 
-    numhsgunits_chg = "Change in number of housing units" 
-    popblacknonhispbridge_chg = "Change in NH Black population";
-  /*title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";*/
-  title2 justify=left color=black font="Lato" height=10pt "Black population change vs. Housing unit change, 2010–20";
-run;
 
-proc sgplot data=A noautolegend uniform=scale;
-  where cluster2017 not in ( "27" );
-  scatter x=numhsgunits_pctchg y=popblacknonhispbridge_pctchg / 
-    markerattrs=(color=&URBAN_COLOR_CYAN symbol=CircleFilled) 
-    /*datalabel datalabelattrs=(color=black family="Lato")*/;
-  reg x=numhsgunits_pctchg y=popblacknonhispbridge_pctchg / lineattrs=(color=&URBAN_COLOR_CYAN pattern=2);
-  xaxis /*display=(nolabel)*/ valueattrs=(color=black family="Lato");
-  yaxis /*display=(nolabel)*/ valueattrs=(color=black family="Lato");
-  format numhsgunits_chg popblacknonhispbridge_chg comma8.0;
-  label 
-    numhsgunits_pctchg = "Pct. change in number of housing units" 
-    popblacknonhispbridge_pctchg = "Pct. change in NH Black population";
-  /*title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";*/
-  title2 justify=left color=black font="Lato" height=10pt "Pct. Black population change vs. Pct. housing unit change, 2010–20";
-run;
+%scatter( 
+  datalabel=cluster2017,
+  x=numhsgunits_chg, 
+  y=popblacknonhispbridge_chg, 
+  xlabel=Housing unit change, 
+  ylabel=NH Black population change, 
+  where=cluster2017 not in ( "27" )
+)
 
-***ods pdf close;
+%scatter( 
+  datalabel=cluster2017,
+  x=numhsgunits_pctchg, 
+  y=popblacknonhispbridge_pctchg, 
+  xlabel=Pct. housing unit change, 
+  ylabel=Pct. NH Black population change, 
+  where=cluster2017 not in ( "27" )
+)
+
+%scatter( 
+  datalabel=cluster2017,
+  x=totpop_chg, 
+  y=popblacknonhispbridge_chg, 
+  xlabel=Population change, 
+  ylabel=NH Black population change, 
+  where=cluster2017 not in ( "27" )
+)
+
+%scatter( 
+  datalabel=cluster2017,
+  x=totpop_pctchg, 
+  y=popblacknonhispbridge_pctchg, 
+  xlabel=Pct. population change, 
+  ylabel=Pct. NH Black population change, 
+  where=cluster2017 not in ( "27" )
+)
+
 ods html close;
