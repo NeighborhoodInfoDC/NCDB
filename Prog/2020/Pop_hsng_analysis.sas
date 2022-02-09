@@ -88,9 +88,14 @@
     /*title1 justify=left color=&URBAN_COLOR_CYAN font="Lato" height=9pt "FIGURE %upcase(&appendix).#BYVAL1";*/
     title2 ' ';
     title3 justify=left color=black font="Lato" height=10pt "&ylabel vs. &xlabel, 2010–2020";
+    %if %length( &where ) > 0 %then %do;
+      footnote3 justify=left color=black font="Lato" height=10pt "%quote(&where)";
+    %end;
+
   run;
   
   title2;
+  footnote3;
 
 %mend scatter;
 
@@ -99,7 +104,7 @@
 
 /** Macro analysis - Start Definition **/
 
-%macro analysis( geo=, geosuf=, geolbl=, datawhere=, datalabel=Y, hbarheight=10in, scatterwhere= );
+%macro analysis( geo=, geosuf=, geolbl=, datawhere=, datalabel=Y, hbarheight=10in, scatterwhere=, outsuf= );
 
   ***********************************************************************************************
   **** Compile data;
@@ -149,13 +154,21 @@
 
   ***********************************************************************************************
   **** Create charts;
+  
+  %fdate()
+  
+  footnote1 justify=left color=black font="Lato" height=10pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+  
+  %if %length( &datawhere ) > 0 %then %do;
+    footnote2 justify=left color=black font="Lato" height=10pt "%quote(&datawhere)";
+  %end;
 
   %let lastfignumber = 0;
 
   options nodate nonumber nocenter nobyline;
   options orientation=portrait leftmargin=0.5in rightmargin=0.5in topmargin=0.5in bottommargin=0.5in;
 
-  ods html file="&_dcdata_default_path\NCDB\Prog\2020\Pop_hsng_analysis_&geo..html" (title="Analysis by &geo");
+  ods html file="&_dcdata_default_path\NCDB\Prog\2020\Pop_hsng_analysis_&geo.&outsuf..html" (title="Analysis by &geo.&outsuf");
 
   ods graphics on / imagemap=on border=off height=&hbarheight width=8in;
 
@@ -212,6 +225,8 @@
   )
 
   ods html close;
+  
+  footnote1;
 
 %mend analysis;
 
@@ -222,7 +237,7 @@
   geosuf=tr10, 
   geo=geo2010, 
   geolbl=Census tract (2010),
-  datawhere=(geo2010=:"11"), 
+  datawhere=(geo2010=:'11'), 
   datalabel=N,
   scatterwhere= 
 )
@@ -231,8 +246,16 @@
 %analysis( 
   geosuf=cl17, 
   geo=cluster2017, 
-  datawhere=(cluster2017 not in ( "40", "41", "42", "43", "44", "45", "46" )), 
-  scatterwhere=(cluster2017 not in ( "27" ))
+  datawhere=(cluster2017 not in ( '40', '41', '42', '43', '44', '45', '46' )),
+  outsuf=_a
+)
+
+%analysis( 
+  geosuf=cl17, 
+  geo=cluster2017, 
+  datawhere=(cluster2017 not in ( '40', '41', '42', '43', '44', '45', '46' )), 
+  scatterwhere=(cluster2017 not in ( '27' )),
+  outsuf=_b
 )
 
 
