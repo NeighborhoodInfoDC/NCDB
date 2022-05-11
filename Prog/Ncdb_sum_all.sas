@@ -17,9 +17,10 @@
 			   SAS1 from Alpha).
   03/16/18 RP  Updated for cluster 2017
   05/22/18 RP  Updated for Stanton Commons
+  05/11/22 EB  Updated fror ward22
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( Ncdb )

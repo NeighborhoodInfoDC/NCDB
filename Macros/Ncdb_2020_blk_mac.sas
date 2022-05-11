@@ -106,6 +106,8 @@
         %Block20_to_cluster17( )
 
         %Block20_to_stantoncommons( )
+
+		%Block20_to_ward22( )
         
       end;
       else do;
@@ -114,7 +116,7 @@
         
       end;
       
-      %let freqvars = &freqvars voterpre2012 anc2012 city cluster2017 psa2012 geo2020 ward2012 eor zip;
+      %let freqvars = &freqvars voterpre2012 anc2012 city cluster2017 psa2012 geo2020 ward2012 eor zip ward2022;
       
     %end;
     

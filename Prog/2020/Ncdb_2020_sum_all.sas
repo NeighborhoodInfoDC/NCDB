@@ -199,6 +199,7 @@ quit;
 %Ncdb_sum_geo( geo=geo2000 )
 %Ncdb_sum_geo( geo=geo2010 )
 %Ncdb_sum_geo( geo=geo2020 )
+%Ncdb_sum_geo( geo=ward2022 )
 
 run;
 
