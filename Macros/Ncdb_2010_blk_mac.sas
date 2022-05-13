@@ -18,6 +18,7 @@
   03/20/17 RP Update for bridge park geography. 
   03/29/17 RP Added 65 years and older variable. 
   06/16/18 RP Update for cluster2017 geography.
+  05/13/22 EB Update for ward2022 geography.
 **************************************************************************/
 
 /** Macro Ncdb_2010_blk_mac - Start Definition **/
@@ -96,11 +97,13 @@
 		%Block10_to_cluster17( )
 
 		%Block10_to_stantoncommons( )
+
+		%Block10_to_ward22( )
         
       end;
       
       %let freqvars = &freqvars voterpre2012 anc2002 anc2012 city cluster2000 cluster_tr2000  
-                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk cluster2017 stantoncommons;
+                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk cluster2017 stantoncommons ward2022;
       
     %end;
     
