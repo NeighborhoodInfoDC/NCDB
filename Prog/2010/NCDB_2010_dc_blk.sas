@@ -23,13 +23,13 @@
   03/16/18 RP Added cluster 2017 geography.
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\dcdata\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Added Stanton Commons geography.
+%let revisions = Add Ward2022 geography.
 ;
 
 %Ncdb_2010_blk_mac( dc )
