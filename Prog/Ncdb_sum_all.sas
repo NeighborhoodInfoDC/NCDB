@@ -17,9 +17,10 @@
 			   SAS1 from Alpha).
   03/16/18 RP  Updated for cluster 2017
   05/22/18 RP  Updated for Stanton Commons
+  05/17/22 EB  Updated for ward 22
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( Ncdb )
@@ -31,7 +32,7 @@
   register=Y,
   
   /** Update with information on latest file revision **/
-  revisions=%str(Added StantonCommons geography),
+  revisions=%str(Added Ward2022 geography),
 
   lib=Ncdb,
   data_pre=Ncdb_sum, 

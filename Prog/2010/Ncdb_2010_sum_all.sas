@@ -21,9 +21,10 @@
   03/22/17 RP Fixed order of datasteps to correct errors when running in batch mode. 
   03/16/18 RP Added cluster 2017 geography.
   05/22/18 RP Added stanton commons geography.
+  05/17/22 EB Added ward 2022 geography
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\dcdata\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( NCDB )
@@ -174,6 +175,7 @@ quit;
 %Ncdb_sum_geo( geo=bridgepk )
 %Ncdb_sum_geo( geo=cluster2017 )
 %Ncdb_sum_geo( geo=stantoncommons )
+%Ncdb_sum_geo( geo=ward2022 )
 
 run;
 
