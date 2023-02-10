@@ -31,7 +31,7 @@
   register=Y,
   
   /** Update with information on latest file revision **/
-  revisions=%str(Added Ward2022 geography),
+  revisions=%str(Fixed source data tract year.),
 
   tract_yr = 2000,  /** DO NOT CHANGE **/
   include_tracts=n,
