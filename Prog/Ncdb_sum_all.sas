@@ -33,9 +33,8 @@
   /** Update with information on latest file revision **/
   revisions=%str(Added Ward2022 geography),
 
-  tract_yr = 2010,
+  tract_yr = 2000,  /** DO NOT CHANGE **/
   include_tracts=n,
-
   lib=Ncdb,
   data_pre=Ncdb_sum, 
   data_label=%str(NCDB summary, DC),
@@ -49,3 +48,4 @@
 )
 
 run;
+
