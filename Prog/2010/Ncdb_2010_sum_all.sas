@@ -22,6 +22,7 @@
   03/16/18 RP Added cluster 2017 geography.
   05/22/18 RP Added stanton commons geography.
   05/17/22 EB Added ward 2022 geography
+  07/03/26 PT Add ANC2023, PSA2019 summaries.
 **************************************************************************/
 
 %include "\\sas1\dcdata\SAS\Inc\StdLocal.sas";
@@ -30,7 +31,7 @@
 %DCData_lib( NCDB )
 
 /** Update with information on latest file revision **/
-%let revisions = %str(Added Stanton Commons geography);
+%let revisions = %str(Add ANC2023, PSA2019 summaries.);
 
 %let year = 2010;
 %let y    = 1;
@@ -163,19 +164,20 @@ quit;
 %Ncdb_sum_geo( geo=eor )
 %Ncdb_sum_geo( geo=anc2002 )
 %Ncdb_sum_geo( geo=anc2012 )
+%Ncdb_sum_geo( geo=anc2023 )
 %Ncdb_sum_geo( geo=city )
 %Ncdb_sum_geo( geo=cluster_tr2000 )
+%Ncdb_sum_geo( geo=cluster2017 )
 %Ncdb_sum_geo( geo=psa2004 )
 %Ncdb_sum_geo( geo=psa2012 )
+%Ncdb_sum_geo( geo=psa2019 )
 %Ncdb_sum_geo( geo=geo2000 )
 %Ncdb_sum_geo( geo=geo2010 )
+%Ncdb_sum_geo( geo=geo2020 )
 %Ncdb_sum_geo( geo=ward2002 )
 %Ncdb_sum_geo( geo=ward2012 )
-%Ncdb_sum_geo( geo=zip )
-%Ncdb_sum_geo( geo=bridgepk )
-%Ncdb_sum_geo( geo=cluster2017 )
-%Ncdb_sum_geo( geo=stantoncommons )
 %Ncdb_sum_geo( geo=ward2022 )
+%Ncdb_sum_geo( geo=zip )
 
 run;
 
