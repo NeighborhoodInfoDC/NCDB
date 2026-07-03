@@ -11,8 +11,8 @@
  Census 2020 PL94-171 data. 
 
  Modifications: 
- 5/13/22 EB Added Ward 2022 geographies
-
+  05/13/22 EB Added Ward 2022 geographies
+  07/03/26 PT Add Geo2020, PSA2019, ANC2023. Remove stantoncommons, bridgepk.
 **************************************************************************/
 
 /** Macro Ncdb_2020_blk_mac - Start Definition **/
@@ -48,20 +48,6 @@
     
     %if &state = dc %then %do;
     
-      /****** TEMPORARY CODE REMOVED 2/5/22 ******
-      
-      length Ward2012 $ 1;
-  
-      Ward2012 = left( compress( SLDU18, "0" ) );
-  
-      label Ward2012 = "Ward (2012)";
-  
-      format Ward2012 $ward12a.;
-      
-      %let freqvars = &freqvars Ward2012;
-      
-      /****************************/
-
       ** Check DC blocks **;
       
       if GeoBlk2020 ~= "" and put( GeoBlk2020, $blk20v. ) = "" then do;
@@ -72,43 +58,41 @@
       
       if GeoBlk2020 ~= "" and put( GeoBlk2020, $blk20v. ) ~= "" then do;
       
-        %Block20_to_vp12() 
+	  %Block20_to_vp12() 
 
-        %Block20_to_tr20( )
+	  %Block20_to_tr00( )
 
         %Block20_to_tr10( )
 
-        %Block20_to_tr00( )
+        %Block20_to_tr20( )
 
         %Block20_to_ward02( )
         
         %Block20_to_ward12( )
         
-        %Block20_to_psa04(  )
+	  %Block20_to_ward22( )
         
-        %Block20_to_psa12(  )
+        %Block20_to_psa04( )
+        
+        %Block20_to_psa12( )
+
+        %Block20_to_psa19( )
 
         %Block20_to_anc02( )
         
         %Block20_to_anc12( )
 
-        %Block20_to_cluster00( )
-        
+        %Block20_to_anc23( )
+
         %Block20_to_cluster_tr00( )
         
+        %Block20_to_cluster17( )
+
         %Block20_to_zip( )
         
         %Block20_to_city( )
         
         %Block20_to_eor( )
-
-        %Block20_to_bpk( )
-
-        %Block20_to_cluster17( )
-
-        %Block20_to_stantoncommons( )
-
-        %Block20_to_ward22( )
 
       end;
       else do;
@@ -117,7 +101,8 @@
         
       end;
       
-      %let freqvars = &freqvars voterpre2012 anc2012 city cluster2017 psa2012 geo2020 ward2012 eor zip ward2022;
+      %let freqvars = &freqvars voterpre2012 anc2002 anc2012 anc2023 city cluster_tr2000 cluster2017  
+                      psa2004 psa2012 psa2019 geo2000 geo2010 geo2020 ward2002 ward2012 ward2022 zip city eor;
       
     %end;
     
