@@ -21,6 +21,7 @@
   03/29/17 RP Added 65 years and older variable. 
   08/15/17 RP Fixed 65 years and older variable. 
   03/16/18 RP Added cluster 2017 geography.
+  07/03/26 PT Add Geo2020, PSA2019, ANC2023. Remove stantoncommons, bridgepk.
 **************************************************************************/
 
 %include "\\sas1\dcdata\SAS\Inc\StdLocal.sas";
@@ -29,8 +30,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Add Ward2022 geography.
-;
+%let revisions = %str(Add Geo2020, PSA2019, ANC2023. Remove stantoncommons, bridgepk.);
 
 %Ncdb_2010_blk_mac( dc )
 
