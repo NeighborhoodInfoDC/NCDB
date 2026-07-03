@@ -14,7 +14,7 @@
  District of Columbia.
 
  Modifications:
-
+  07/03/26 PT Add Geo2020, PSA2019, ANC2023. Remove stantoncommons, bridgepk.
 **************************************************************************/
 
 %include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
@@ -23,8 +23,7 @@
 %DCData_lib( NCDB )
 %DCData_lib( Census, local=n )
 
-%let revisions = Add Ward2022 geography.
-;
+%let revisions = %str(Add Geo2020, PSA2019, ANC2023. Remove stantoncommons, bridgepk.);
 
 %Ncdb_2020_blk_mac( dc )
 
