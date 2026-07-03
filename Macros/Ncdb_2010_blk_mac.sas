@@ -19,6 +19,7 @@
   03/29/17 RP Added 65 years and older variable. 
   06/16/18 RP Update for cluster2017 geography.
   05/13/22 EB Update for ward2022 geography.
+  07/03/26 PT Add Geo2020, PSA2019, ANC2023. Remove stantoncommons, bridgepk.
 **************************************************************************/
 
 /** Macro Ncdb_2010_blk_mac - Start Definition **/
@@ -64,46 +65,46 @@
       
       if GeoBlk2010 ~= "" and put( GeoBlk2010, $blk10v. ) ~= "" then do;
       
-		%Block10_to_vp12() 
+	  %Block10_to_vp12() 
 
-		%Block10_to_tr10( )
+	  %Block10_to_tr00( )
 
-        %Block10_to_tr00( )
+        %Block10_to_tr10( )
+
+        %Block10_to_tr20( )
 
         %Block10_to_ward02( )
         
         %Block10_to_ward12( )
         
-        %Block10_to_psa04(  )
+	  %Block10_to_ward22( )
         
-        %Block10_to_psa12(  )
+        %Block10_to_psa04( )
+        
+        %Block10_to_psa12( )
+
+        %Block10_to_psa19( )
 
         %Block10_to_anc02( )
         
         %Block10_to_anc12( )
 
-        %Block10_to_cluster00( )
-        
+        %Block10_to_anc23( )
+
         %Block10_to_cluster_tr00( )
         
+        %Block10_to_cluster17( )
+
         %Block10_to_zip( )
         
         %Block10_to_city( )
         
         %Block10_to_eor( )
 
-		%Block10_to_bpk( )
-
-		%Block10_to_cluster17( )
-
-		%Block10_to_stantoncommons( )
-
-		%Block10_to_ward22( )
-        
       end;
       
-      %let freqvars = &freqvars voterpre2012 anc2002 anc2012 city cluster2000 cluster_tr2000  
-                      psa2004 psa2012 geo2000 geo2010 ward2002 ward2012 eor zip bridgepk cluster2017 stantoncommons ward2022;
+      %let freqvars = &freqvars voterpre2012 anc2002 anc2012 anc2023 city cluster_tr2000 cluster2017  
+                      psa2004 psa2012 psa2019 geo2000 geo2010 geo2020 ward2002 ward2012 ward2022 zip city eor;
       
     %end;
     
