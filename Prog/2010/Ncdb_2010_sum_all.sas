@@ -22,6 +22,7 @@
   03/16/18 RP Added cluster 2017 geography.
   05/22/18 RP Added stanton commons geography.
   05/17/22 EB Added ward 2022 geography
+  07/03/26 PT Add ANC2023, PSA2019 summaries.
 **************************************************************************/
 
 %include "\\sas1\dcdata\SAS\Inc\StdLocal.sas";
@@ -30,7 +31,7 @@
 %DCData_lib( NCDB )
 
 /** Update with information on latest file revision **/
-%let revisions = %str(Added Stanton Commons geography);
+%let revisions = %str(Add ANC2023, PSA2019 summaries.);
 
 %let year = 2010;
 %let y    = 1;
