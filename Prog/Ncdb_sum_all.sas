@@ -24,23 +24,21 @@
 ** Define libraries **;
 %DCData_lib( Ncdb )
 
-
 %Create_all_summary_from_tracts( 
 
-  /** Change to N for testing, Y for final batch mode run **/
-  register=Y,
-  
   /** Update with information on latest file revision **/
-  revisions=%str(Fixed source data tract year.),
+  revisions=%str(Refresh Geo2010 summary. Add ANC2023, PSA2019 summaries.),
 
   tract_yr = 2000,  /** DO NOT CHANGE **/
-  include_tracts=n,
+  include_tracts=y,
+  state_filter='11',
   lib=Ncdb,
   data_pre=Ncdb_sum, 
   data_label=%str(NCDB summary, DC),
-  count_vars=agg: /****SHOULD CALCULATE AVERAGES avg:****/ Children: elderly: females: grossrent: males: num: 
+  count_vars=agg: Children: elderly: females: grossrent: males: num: 
     people: persons: pop: poverty: tot:, 
   prop_vars=median:, 
+  /** Avg: vars currently omitted. Should be created as calculated vars. **/
   calc_vars=, 
   calc_vars_labels=,
   creator_process=Ncdb_sum_all.sas,

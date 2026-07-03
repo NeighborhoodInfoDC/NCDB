@@ -9,6 +9,10 @@
  GitHub issue:  54
  
  Description:  Create NCDB summary file for 2020 tracts
+ 
+ Since there is no 2000 -> 2020 weighting file, 
+ reweight 2000 -> 2010 data to 2020.
+ 
 
  Modifications:
 **************************************************************************/
