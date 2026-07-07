@@ -28,7 +28,7 @@
     dat_org_geo=geo2010,
     dat_count_vars=
       agg: Children: elderly: females: grossrent: males: num: people: persons: 
-      pop5: pop16: pop18: pop25: popasian: popbelow: popblack: popcivilian: 
+      pop5: pop16: pop18: pop25: pop65: popasian: popbelow: popblack: popcivilian: 
       popemploy: popenglish: popfemale: popforeign: popgroup: pophisp: popinc: 
       popmale: popmin: popnative: popnot: popother: poppoor: popsame: popspanish: 
       poptravel: popun: popwhite: popwith: popwork: poverty: tot:,
@@ -57,8 +57,9 @@
   outlib=Ncdb,
   label="NCDB summary, DC, Census tract (2020)",
   sortby=geo2020,
+  printobs=5,
   freqvars=geo2020,
-  revisions=%str(New file.)
+  revisions=%str(Add Pop65* vars.)
 )
 
 
