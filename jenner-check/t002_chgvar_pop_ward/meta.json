@@ -1,0 +1,7 @@
+{
+  "bundle": "t002_chgvar_pop_ward",
+  "source_file": "Prog/C100/C100_pop_ward.sas",
+  "source_blob_sha": "dd9eea5580d585031a5dc7a064d9b3311e9c2d3c",
+  "source_commit": "643d635cc619913ab3938e881900c05f7e127909",
+  "notes": "Repo's %ChgVar macro (verbatim) computing 1980->1990, 1990->2000, 2000->2010 decennial change vars, plus the repo's six PROC PRINT reports by ward (verbatim). Only substitution: input Ncdb.C100_wd02 (not in repo) replaced by an 8-ward synthetic C100_wd02 with the decennial population columns %ChgVar consumes."
+}

@@ -1,0 +1,14 @@
+{
+  "_captured_at": "2026-07-10T17:32:29+00:00",
+  "_captured_run_id": "r_6dfb859a14074cf3812b003f9e9fe18a",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Wrote Census_pl_2010_dc (3 rows, 149 columns).",
+    "NOTE: Read 3 rows from Census_pl_2010_dc.",
+    "NOTE: Wrote Ncdb_2010_vars (3 rows, 218 columns).",
+    "NOTE: PROC PRINT completed: 3 observations printed, 15 variables"
+  ],
+  "log_does_not_contain": ["ERROR:", "[JENNER-ERROR"],
+  "diagnostics": {"parse_warnings": [], "runtime_warnings": []}
+}

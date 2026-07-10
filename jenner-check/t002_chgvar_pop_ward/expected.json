@@ -1,0 +1,14 @@
+{
+  "_captured_at": "2026-07-10T17:33:44+00:00",
+  "_captured_run_id": "r_033cd2535ffa417e97079b9c76a2ffc9",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Read 8 rows from DATALINES.",
+    "NOTE: Wrote C100_wd02 (8 rows, 21 columns).",
+    "NOTE: Wrote Pop_ward (8 rows, 36 columns).",
+    "NOTE: PROC PRINT completed: 8 observations printed, 4 variables"
+  ],
+  "log_does_not_contain": ["ERROR:", "[JENNER-ERROR"],
+  "diagnostics": {"parse_warnings": [], "runtime_warnings": []}
+}
