@@ -1,0 +1,7 @@
+{
+  "bundle": "t001_ncdb_2010_pl_vars",
+  "source_file": "Macros/NCDB_2010_pl_vars.sas",
+  "source_blob_sha": "9025fc2672fa19ea62cd077af289cb45a7eda84a",
+  "source_commit": "643d635cc619913ab3938e881900c05f7e127909",
+  "notes": "Repo's %NCDB_2010_pl_vars autocall macro (verbatim) that derives NCDB 2010 race/ethnicity/age/housing variables from Census PL94-171 fields. Bundle supplies 3 synthetic census blocks (all P1/P2/P3/H1 cells the macro reads) since NCDB source data is not in the repo; calls the macro; PROC PRINTs computed vars. No edits to macro logic."
+}

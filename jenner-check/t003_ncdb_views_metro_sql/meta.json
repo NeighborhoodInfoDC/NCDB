@@ -1,0 +1,7 @@
+{
+  "bundle": "t003_ncdb_views_metro_sql",
+  "source_file": "Prog/Create_ncdb_views_was20.sas",
+  "source_blob_sha": "0cd465c343a6a20f7815c99f7dce95dc5015b354",
+  "source_commit": "643d635cc619913ab3938e881900c05f7e127909",
+  "notes": "Repo's %Create_view PROC SQL (verbatim select/where): adds Metro20 = put(ucounty, $ctym20f.) with the repo's length/label and filters to counties mapping to a 2020 metro area. Substitutions: define $ctym20f. inline from Washington-region county codes; supply synthetic Ncdb_lf_2000 with a ucounty column; materialize as a table instead of a registered Ncdb view (drops external %File_info/%DC_update_meta_file metadata calls) so the result prints."
+}
